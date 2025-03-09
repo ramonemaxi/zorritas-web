@@ -1,0 +1,56 @@
+<div class="modal fade" id="ventaModal-{{ prenda.pk }}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Marcar como vendida: {{prenda.descripcion}}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              
+  
+                <form method="POST" action="{% url 'registrar_venta'%}" class="prenda-edit-form-{{ prenda.pk }}">
+                    {% csrf_token %}
+                    
+                    <!-- Campo oculto  para el id del cliente -->
+                     <input type="hidden" name="prenda_id" value="{{ prenda.pk }}">
+                     <input type="hidden" name="cliente_id" value="{{ prenda.cliente_id_id }}">
+                    
+
+                      <!-- Campo para la descripción -->
+                      <div class="form-group">
+                        <label for="id_fecha_venta">Descripción:</label>
+                        <input type="date" 
+                               name="fecha_venta" 
+                               {% if prenda.fecha_venta %}
+                               value="{{ prenda.fecha_venta|date:'Y-m-d' }}" 
+                               {% else %}
+                               value="{{ fecha_actual|date:'Y-m-d' }}" 
+                               {% endif %}
+                               
+
+                               class="form-control"
+                               required>
+                    </div>
+                    
+                    
+              
+                  
+  
+            </div>
+            
+            <div class="modal-footer">
+                    <button type="submit" name="borrar_fecha" value="true" class="btn btn-danger">
+                        No vendida
+                    </button>
+                
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-primary">Vendida</button>
+            </div>
+                </form>
+        </div>
+    </div>
+  </div>
+</div>
+  

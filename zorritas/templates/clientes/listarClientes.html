@@ -1,0 +1,411 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %} Clientes {% endblock title %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'plugins/summernote/summernote-bs4.min.css' %}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+{% endblock extrastyle %}
+{% block bodyclass %} hold-transition sidebar-mini {% endblock bodyclass %}
+{% block content %}
+<style>
+  .table td {
+    vertical-align: middle; /* Centrado vertical */
+}
+
+  .table-active {
+  background-color:rgba(175, 175, 206, 0.37) !important;
+  }
+  #clientes th:nth-child(2), #clientes td:nth-child(2) {
+  width: 70px;  /* Ajusta el valor según lo necesites */
+  word-wrap: break-word;  /* Para manejar el texto largo, si es necesario */
+}
+  .fa-lg {
+  font-size: 1.5rem;  /* Ajusta el tamaño */
+  margin-right: 10px;  /* Ajusta el espacio entre los íconos */
+}
+  #clientes thead,
+table.dataTable tfoot {
+    display: none;
+}
+ /* Estilo para el campo de búsqueda */
+ .dataTables_filter {
+    width: 100% !important;
+  }
+  
+  .dataTables_filter input {
+    width: 130px !important;
+    max-width: 100% !important;
+  }
+
+  /* Hacer la tabla responsiva */
+  .table-responsive {
+    overflow-x: auto;
+  }
+  table.dataTable tbody th, 
+  table.dataTable tbody td {
+    padding: 2px 6px !important;
+  }
+  .nav-link.active-top-border {
+    border-top: 2px solid blue; /* Puedes ajustar el color y el grosor del borde */
+  }
+</style>
+{% if messages %}
+<script>
+  $(document).ready(function() {
+
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            toastr.success("{{ message }}");
+            
+        {% endif %}
+    {% endfor %}
+});
+</script>
+{% endif %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Clientes</h1>
+            
+          </div>
+          
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <table >
+                <thead>
+                <tr>
+
+                  <th>
+                    <li class="btn btn-block btn-outline-info btn-flat" data-toggle="tooltip" title=E-mail>
+                      <i class="fa-regular fa-envelope"></i> {% if cliente_actual %}{{cliente_actual.email}}{% endif %}
+                  </li>
+                  </th>
+                  <th>
+                    <li class="btn btn-block btn-outline-success btn-flat" data-toggle="tooltip" title="Telefono">
+                      <i class="fa-solid fa-mobile-screen"></i> {% if cliente_actual %}{{cliente_actual.telefono}}{% endif %}
+                  </li>
+                  </th>
+                  <th>
+                    <li class="btn btn-block btn-outline-dark" data-toggle="tooltip" title="Instagram">
+                      <i class="fa-brands fa-instagram"></i> {% if cliente_actual %}{{cliente_actual.instagram}}{% endif %}
+                  </li>
+                  </th>
+                  <th>
+                    <li class="btn btn-block btn-outline-primary btn-flat" data-toggle="tooltip" title="Alias">
+                      <i class="fa-solid fa-money-bill-transfer"></i> {% if cliente_actual %}{{cliente_actual.alias}}{% endif %} 
+                  </li>
+                  </th>
+                </tr>
+                </thead>
+                <tbody>
+                </table> 
+              
+            
+              </ol>
+       
+          </div>
+          
+        </div>
+        <div class="col-md-12 col-lg-12 col-xl-12 text-right" style="margin-top: 20px;">
+         
+
+          <div class="btn btn-outline-dark" data-toggle="tooltip" title="Nombre">
+            <a style = "text-decoration: None; color: inherit; " href = "{% if cliente_actual %}{% url 'info_cliente' cliente_actual.pk %}{% else %}#{% endif %}"> <i class="fa-solid fa-person-half-dress fa-xl"></i> {{ cliente_actual.nombre }} </a>
+          </div>
+        
+          <div class="btn btn-outline-warning btn-flat" data-toggle="tooltip" title=Editar Cliente>
+            <i class="fa-solid fa-pen-to-square " data-toggle="modal" data-target="#editModal-{{ cliente_actual.pk }}"></i>
+
+          </div>
+          <div class="btn btn-outline-danger btn-flat" data-toggle="tooltip" title=Eliminar CLiente>
+            <i class="fa-solid fa-trash-can" data-toggle="modal" data-target="#deleteModal-{{ cliente_actual.pk }}"></i>
+
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+      
+    </section>
+    <!-- Info creditos -->
+    <section>
+      <!-- totales -->
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-info"><i class="fa-regular fa-money-bill-1"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Efectivo</span>
+                <span class="info-box-number">{{ total_efectivo }}</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-success"><i class="fa-regular fa-credit-card"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Credito</span>
+                <span class="info-box-number">{{ total_credito }}</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-success"><i class="fa-solid fa-cart-shopping"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Prendas Vendidas</span>
+                <span class="info-box-number">{{ total_prendas_vendidas }}</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-danger"><i class="fa-solid fa-cash-register"></i></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Prendas por Cobrar</span>
+                <span class="info-box-number">{{ total_prendas_a_cobrar }}</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+        </div>
+      </div>
+      <!-- /totales -->
+    </section>
+    <!-- /info creditos-->
+    <!-- Main content -->
+    <section class="content">
+
+      <div class="container-fluid">
+        <div class="row" >
+          <!-- Clientes -->
+          <div class="col-md-3" >
+             
+            <div class="card">
+              <div class="card-header d-flex align-items-center w-100">
+                <h3 class="card-title">Clientes</h3>
+                
+                <div data-toggle="modal" data-target="#createModal" class="ml-auto btn btn-flat btn-outline-success">
+                  <div href="#" data-toggle="tooltip" title="Agregar Cliente" >
+                    
+                    <i class="fa-solid fa-user-plus"></i>
+                  
+                  </div>
+              </div>
+               
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body clientes-card-body">
+                
+                  
+                  <table id="clientes" class="table table-bordered table-striped">
+                  <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    
+                    
+                  </tr>
+                  
+                  </thead>
+                  <tbody>
+                    {% for cliente in clientes %}
+                    <tr >
+                      <td >
+                        <a href="{% url 'cliente_detalle' cliente.pk %}" class="btn btn-flat btn-block btn-outline-dark">{{ cliente.nombre }}</a>
+                      </td>
+                      
+                    </tr>
+                  
+                  {% endfor %}
+                  
+                  </tbody>
+                  <tfoot>
+                  <tr>
+                    <th>Nombre</th>
+                    
+                    
+                  </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /Clientes -->
+          <!-- Prendas -->
+          <div class="col-12 col-sm-9">
+    <div class="card card-primary card-outline card-outline-tabs">
+        <div class="card-header p-0 border-bottom-0">
+            <ul style="padding-bottom: 18px;" class="nav nav-tabs d-flex align-items-center w-100" id="custom-tabs-three-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link {% if pestania == 'todas' %}active{% endif %}" id="custom-tabs-three-todas-tab" data-toggle="pill" href="#custom-tabs-three-todas" role="tab" aria-controls="custom-tabs-three-todas" aria-selected="true">Todas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if pestania == 'stock' %}active{% endif %}" id="custom-tabs-three-stock-tab" data-toggle="pill" href="#custom-tabs-three-stock" role="tab" aria-controls="custom-tabs-three-stock" aria-selected="false">Stock</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if pestania == 'no_cobrada' or pestania == 'cobrada' %}active %}{% endif %}" id="custom-tabs-three-vendidas-tab" data-toggle="pill" href="#custom-tabs-three-vendidas" role="tab" aria-controls="custom-tabs-three-vendidas" aria-selected="false">Vendidas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-three-settings-tab" data-toggle="pill" href="#custom-tabs-three-settings" role="tab" aria-controls="custom-tabs-three-settings" aria-selected="false">Settings</a>
+                </li>
+                <li href="#" data-toggle="tooltip" title="Agregar Prenda" class="ml-auto btn btn-flat btn-outline-success" >
+                    <i class="fa-solid fa-shirt" data-toggle="modal" data-target="#crearPrendaModal"></i>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="custom-tabs-three-tabContent">
+                <div class="tab-pane fade {% if pestania == 'todas' %}show active{% endif %}" id="custom-tabs-three-todas" role="tabpanel" aria-labelledby="custom-tabs-three-todas-tab">
+                    {% include 'ingresos/prendas/todas_prendas.html' %}
+                </div>
+                <div class="tab-pane fade {% if pestania == 'stock' %}show active{% endif %}" id="custom-tabs-three-stock" role="tabpanel" aria-labelledby="custom-tabs-three-stock-tab">
+                    {% include 'ingresos/prendas/stock_prendas.html' %}
+                </div>
+                <div class="tab-pane fade {% if pestania == 'no_cobrada' or pestania == 'cobrada' %}show active %}{% endif %} " id="custom-tabs-three-vendidas" role="tabpanel" aria-labelledby="custom-tabs-three-vendidas-tab">
+                    <ul style="padding-bottom: 18px;" class="nav nav-tabs  ml-auto " id="vendidas-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link {% if pestania == 'cobrada' or pestania == 'todas' %} active{% endif %}" id="vendidas-cobradas-tab" data-toggle="pill" href="#vendidas-cobradas" role="tab" aria-controls="vendidas-cobradas" aria-selected="false">Cobradas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if pestania == 'no_cobrada' %} active {% endif %}" id="vendidas-no-cobradas-tab" data-toggle="pill" href="#vendidas-no-cobradas" role="tab" aria-controls="vendidas-no-cobradas" aria-selected="false">No Cobradas</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="vendidas-tabContent">
+                        <div class="tab-pane fade {% if pestania == 'cobrada' or pestania == 'todas' %}show active{% endif %}" id="vendidas-cobradas" role="tabpanel" aria-labelledby="vendidas-cobradas-tab">
+                            {% include 'ingresos/prendas/cobradas_prendas.html' %}
+                        </div>
+                        <div class="tab-pane fade {% if pestania == 'no_cobrada' %}show active{% endif %}" id="vendidas-no-cobradas" role="tabpanel" aria-labelledby="vendidas-no-cobradas-tab">
+                            {% include 'ingresos/prendas/no_cobradas_prendas.html' %}
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="custom-tabs-three-settings" role="tabpanel" aria-labelledby="custom-tabs-three-settings-tab">
+                    {% include 'ingresos/prendas/editor.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+          <!-- /Prendas -->
+        </div>
+        <!-- /.row -->
+        
+      </div>
+      <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  
+  {% include "clientes/crear_cliente.html" %}
+  {% if cliente_actual %}
+  {% include "clientes/editar_cliente.html" %} 
+  {% include "clientes/eliminar_cliente.html" %}
+  {% include "ingresos/prendas/crear_prenda.html" %}
+  {% endif %}
+  
+ 
+  
+
+  
+{% endblock content %}
+{% block extra_scripts %}
+
+<!-- DataTables  & Plugins -->
+
+
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+<script src="{% static 'plugins/summernote/summernote-bs4.min.js' %}"></script>
+{% include "ingresos/prendas/scripts/datatables/todas.html" %}
+{% include "ingresos/prendas/scripts/datatables/stock.html" %}
+{% include "ingresos/prendas/scripts/datatables/cobradas.html" %}
+{% include "ingresos/prendas/scripts/datatables/no_cobradas.html" %}
+{% include "ingresos/prendas/scripts/datatables/vendidas.html" %}
+
+
+<!-- Page specific script -->
+<script>
+  $(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+      $("#clientes").DataTable({
+        "stateSave": true,
+        dom: '<"top"f>rt<"bottom"lp><"clear">',
+        pageLength: 10,
+        language: {
+
+          "search": "Buscar:",
+          "lengthMenu": "Mostrar _MENU_ registros por página",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+          "infoFiltered": "(filtrado de _MAX_ registros totales)",
+          "paginate": {
+            "first": "Primero",
+            "last": "Último",
+            "next": ">",
+            "previous": "<"
+          }
+        },
+
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": false,
+        "info": false,
+        "autoWidth": true,
+        "responsive": false,
+        initComplete: function () {
+          let tabla = $("#clientes").DataTable();
+          let paginaGuardada = localStorage.getItem("paginaClientes");
+          if (paginaGuardada !== null) {
+            tabla.page(parseInt(paginaGuardada)).draw("page");
+          }
+        }
+      });
+      $("#clientes").on("page.dt", function () {
+        localStorage.setItem("paginaClientes", $("#clientes").DataTable().page());
+      });
+  });
+</script>
+<script>
+  $(function () {
+    // Summernote
+    $('#summernote').summernote()
+  });
+</script>
+{% endblock extra_scripts %}

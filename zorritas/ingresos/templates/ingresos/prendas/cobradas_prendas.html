@@ -1,0 +1,91 @@
+<section class="content">
+
+
+
+
+
+  <table id="cobradas" class="table table-bordered table-striped">
+    <thead>
+      <tr>
+
+        <th>Descripcion</th>
+        <th>Precio</th>
+        <th>Precio Efectivo</th>
+        <th>Precio Credito</th>
+        <th>Cobrada</th>
+        <th>Fecha de Venta</th>
+        <th>Fecha de Cobro</th>
+        <th>Fecha de Ingreso</th>
+
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for prenda in prendas_cobradas %}
+      <tr>
+        <td>{{ prenda.descripcion }}</td>
+        <td>{{ prenda.precio }}</td>
+        <td>{{ prenda.precio_efectivo }}</td>
+        <td>{{ prenda.precio_credito }}</td>
+        
+        <td>
+          <div class="cobro-container">
+          <div data-toggle="modal" 
+                  data-target="#confirmarDescobroModal{{ prenda.pk }}" class="cobro-hover">
+                  <div class="cobro-hover">
+                    <span class="cruz"><i class="fa-solid fa-check fa-xl" style="color: #24d917;" aria-hidden="true"></i></span>
+                    <span class="check"><i class="fa-solid fa-xmark fa-xl" style="color: #d70f0f;" aria-hidden="true"></i></span>
+                    
+                  </div>
+              </div>
+        </td>
+                    
+        <td>{{ prenda.fecha_venta_formateada }}</td>
+        <td>{{ prenda.fecha_cobro_formateada }}</td>
+        <td>
+          {% with prenda.fecha_ingreso|date:'Y-m-d' as formatted_date %}
+          {% if formatted_date == '1999-01-01' %}
+          <i class="fa-solid fa-xmark fa-xl" style="color:rgba(167, 43, 21, 0.89);"></i>
+          {% else %}
+          {{ prenda.fecha_ingreso_formateada}}
+          {% endif %}
+          {% endwith %}
+        </td>
+        
+
+
+      </tr>
+      {% include "ingresos/prendas/confirmar_descobro.html" %}
+
+      {% endfor %}
+
+
+    </tbody>
+    <tfoot>
+      <tr>
+
+        <th>Descripcion</th>
+        <th>Precio</th>
+        <th>precio_efectivo</th>
+        <th>precio_credito</th>
+        <th>Cobrada</th>
+        <th>Fecha de Venta</th>
+        <th>Fecha de Cobro</th>
+        <th>Fecha de Ingreso</th>
+
+      </tr>
+    </tfoot>
+
+  </table>
+
+  <!-- /.card-body -->
+
+  <!-- /.card -->
+
+  <!-- /.col -->
+
+  <!-- /.row -->
+
+  <!-- /.container-fluid -->
+</section>
+<!-- /.content -->

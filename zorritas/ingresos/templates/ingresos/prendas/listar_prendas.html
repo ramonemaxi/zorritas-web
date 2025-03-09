@@ -1,0 +1,92 @@
+<section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header d-flex align-items-center w-100">
+              <h3 class="card-title">Prendas</h3>
+              
+                <li href="#" data-toggle="tooltip" title="Agregar Prenda" class="ml-auto btn btn-flat btn-outline-success" >
+                
+                  <i class="fa-solid fa-shirt" data-toggle="modal" data-target="#crearPrendaModal"></i>
+                
+              </li>
+              
+             
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              <table id="prendas" class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    
+                    <th>Descripcion</th>
+                    <th>Precio</th>
+                    <th>Fecha de Ingreso</th>
+                    <th>Opciones</th>
+                    
+                  </tr>
+                </thead>
+                
+                <tbody>
+                  {% for prenda in prendas_en_stock %}
+                  <tr>
+                    <td>{{ prenda.descripcion }}</td>
+                    <td>{{ prenda.precio }}</td>
+                    <td>
+                      {% with prenda.fecha_ingreso|date:'Y-m-d' as formatted_date %}
+                        {% if formatted_date == '1999-01-01' %}
+                            Fecha Sin Definir
+                        {% else %}
+                            {{ prenda.fecha_ingreso}}
+                        {% endif %}
+                      {% endwith %}
+                    </td>
+                    <td>
+                      <div>
+                      <div style="font-size: 0.8em;" class="btn btn-outline-warning btn-flat" data-toggle="tooltip" title=Editar Cliente>
+                        <i class="fa-solid fa-pen-to-square" data-toggle="modal" data-target="#editPrendaModal-{{ prenda.pk }}"></i>
+            
+                      </div>
+                     
+                      <div style="font-size: 0.8em;" class="btn btn-outline-danger btn-flat" data-toggle="tooltip" title=Eliminar CLiente>
+                        <i class="fa-solid fa-trash-can" data-toggle="modal" data-target="#deletePrendaModal-{{ prenda.pk }}"></i>
+                        
+                      </div>
+                    </div>
+
+                    </td>
+                    
+                    
+                  </tr>
+                  {% include "prendas/editar_prenda.html" %}
+                  {% include "prendas/eliminar_prenda.html" %}   
+                  
+                  {% endfor %}
+                  
+                
+                </tbody>
+                <tfoot>
+                  <tr>
+                    
+                    <th>Descripcion</th>
+                    <th>Precio</th>
+                    <th>Fecha de Ingreso</th>
+                    <th>Opciones</th>
+                    
+                  </tr>
+                  </tfoot>
+                
+              </table>
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->

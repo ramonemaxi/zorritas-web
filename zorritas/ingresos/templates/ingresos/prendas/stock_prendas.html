@@ -1,0 +1,122 @@
+<section class="content">
+
+
+
+
+
+  <table id="stock" class="table table-bordered table-striped">
+    <thead>
+      <tr>
+
+        <th>Descripcion</th>
+        <th>Precio</th>
+        <th>Precio Efectivo</th>
+        <th>Precio Credito</th>
+        <th>Cobrada</th>
+        <th>Fecha de Venta</th>
+        <th>Fecha de Cobro</th>
+        <th>Fecha de Ingreso</th>
+        <th>Vender</th>
+        <th>Opciones</th>
+
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for prenda in prendas_en_stock %}
+      <tr>
+        <td>{{ prenda.descripcion }}</td>
+        <td>{{ prenda.precio }}</td>
+        <td>{{ prenda.precio_efectivo }}</td>
+        <td>{{ prenda.precio_credito }}</td>
+        {% if prenda.cobrada == True %}
+                        <td><i class="fa-solid fa-check fa-xl" style="color: #24d917;"></i></td>
+                    {% else %}
+                        <td><i class="fa-solid fa-xmark fa-xl" style="color: #d70f0f;"></i></td>
+                    {% endif %}
+        <td>{{ prenda.fecha_venta_formateada }}</td>
+        <td>{{ prenda.fecha_cobro_formateada }}</td>
+        <td>
+          {% with prenda.fecha_ingreso|date:'Y-m-d' as formatted_date %}
+          {% if formatted_date == '1999-01-01' %}
+          <i class="fa-solid fa-xmark fa-xl" style="color:rgba(167, 43, 21, 0.89);"></i>
+          {% else %}
+          {{ prenda.fecha_ingreso_formateada}}
+          {% endif %}
+          {% endwith %}
+        </td>
+       <td> 
+        <div style="font-size: 0.8em;" data-toggle="modal" 
+          data-target="#confirmarVentaModal{{ prenda.pk }}" 
+          class=" btn  btn-outline-success">
+            <div href="#" data-toggle="tooltip" title="Vender">
+
+              <i class="fa-solid fa-money-bill-1 fa-xl"></i>
+
+            </div>
+          </div>
+       </td>
+        <td>
+          <div style="font-size: 0.8em;" data-toggle="modal" 
+          data-target="#editPrendaModalStock-{{ prenda.pk }}" 
+          class="ml-auto btn btn-flat btn-outline-warning">
+            <div href="#" data-toggle="tooltip" title="Editar Prenda">
+
+              <i class="fa-solid fa-pen-to-square"></i>
+
+            </div>
+          </div>
+
+
+          <div style="font-size: 0.8em;" data-toggle="modal"
+            data-target="#deletePrendaModalStock-{{ prenda.pk }}"
+            class="ml-auto btn btn-flat btn-outline-danger">
+            <div href="#" data-toggle="tooltip" title="Eliminar Prenda">
+
+              <i class="fa-solid fa-trash-can"></i>
+
+            </div>
+          </div>
+          </div>
+
+        </td>
+
+
+      </tr>
+      {% include "ingresos/prendas/editar_prenda_stock.html" %}
+      {% include "ingresos/prendas/eliminar_prenda_stock.html" %}
+      {% include "ingresos/prendas/confirmar_venta.html" %}
+      {% endfor %}
+
+
+    </tbody>
+    <tfoot>
+      <tr>
+
+        <th>Descripcion</th>
+        <th>Precio</th>
+        <th>precio_efectivo</th>
+        <th>precio_credito</th>
+        <th>Cobrada</th>
+        <th>Fecha de Venta</th>
+        <th>Fecha de Cobro</th>
+        <th>Fecha de Ingreso</th>
+        <th>Vender</th>
+        <th>Opciones</th>
+
+      </tr>
+    </tfoot>
+
+  </table>
+
+  <!-- /.card-body -->
+
+  <!-- /.card -->
+
+  <!-- /.col -->
+
+  <!-- /.row -->
+
+  <!-- /.container-fluid -->
+</section>
+<!-- /.content -->

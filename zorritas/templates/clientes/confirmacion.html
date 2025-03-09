@@ -1,0 +1,6 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<h2>Total a cobrar: ${{ total }}</h2>
+<a href="{% url 'cobrar_prendas' cliente.id %}">Volver</a>
+{% endblock %}

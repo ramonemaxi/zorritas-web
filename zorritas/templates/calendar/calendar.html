@@ -1,0 +1,338 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %} Calendario {% endblock title %}
+
+{% block extrastyle %}
+
+  <!-- fullCalendar -->
+  <link rel="stylesheet" href="{% static 'plugins/fullcalendar/main.css' %}">
+
+{% endblock extrastyle %}
+
+{% block bodyclass %} hold-transition sidebar-mini {% endblock bodyclass %}
+
+{% block content %}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Calendario Zorritas</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Calendar<io/li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="sticky-top mb-3">
+              <div class="card">
+                <div class="card-header">
+                  <h4 class="card-title">Eventos arrastrables</h4>
+                </div>
+                <div class="card-body">
+                  <!-- the events -->
+                  <div id="external-events">
+                    <div class="external-event bg-success">Comer</div>
+                    <div class="external-event bg-warning">Ir a casa</div>
+                    <div class="external-event bg-info">Trabajo de Casa</div>
+                    <div class="external-event bg-primary">Donaciones</div>
+                    <div class="external-event bg-danger">Hacer la caja</div>
+                    <div class="checkbox">
+                      
+                    </div>
+                  </div>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">Crear evento</h3>
+                </div>
+                <div class="card-body">
+                  <div class="btn-group" style="width: 100%; margin-bottom: 10px;">
+                    <ul class="fc-color-picker" id="color-chooser">
+                      <li><a class="text-primary" href="#"><i class="fas fa-square"></i></a></li>
+                      <li><a class="text-warning" href="#"><i class="fas fa-square"></i></a></li>
+                      <li><a class="text-success" href="#"><i class="fas fa-square"></i></a></li>
+                      <li><a class="text-danger" href="#"><i class="fas fa-square"></i></a></li>
+                      <li><a class="text-muted" href="#"><i class="fas fa-square"></i></a></li>
+                    </ul>
+                  </div>
+                  <!-- /btn-group -->
+                  <div class="input-group">
+                    <input id="new-event" type="text" class="form-control" placeholder="Nombre del evento">
+
+                    <div class="input-group-append">
+                      <button id="add-new-event" type="button" class="btn btn-primary">Agregar</button>
+                    </div>
+                    <!-- /btn-group -->
+                  </div>
+                  <!-- /input-group -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /.col -->
+          <div class="col-md-9">
+            <div class="card card-primary">
+              <div class="card-body p-0">
+                <!-- THE CALENDAR -->
+                <div id="calendar"></div>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+   
+
+  {% endblock content %}
+
+  {% block extra_scripts %}
+
+  <!-- jQuery UI -->
+  <script src="{% static 'plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+  <!-- fullCalendar 2.2.5 -->
+  <script src="{% static 'plugins/moment/moment.min.js' %}"></script>
+  <script src="{% static 'plugins/fullcalendar/main.js' %}"></script>
+  <script src="{% static 'plugins/fullcalendar/locales/es.js' %}"></script>
+
+  <!-- Page specific script -->
+  <script>
+    $(function () {
+  
+      /* initialize the external events
+      -----------------------------------------------------------------*/
+      function ini_events(ele) {
+        ele.each(function () {
+          // create an Event Object (https://fullcalendar.io/docs/event-object)
+          var eventObject = {
+            title: $.trim($(this).text()) // use the element's text as the event title
+          }
+          console.log(eventObject);
+  
+          // store the Event Object in the DOM element so we can get to it later
+          $(this).data('eventObject', eventObject)
+  
+          // make the event draggable using jQuery UI
+          $(this).draggable({
+            zIndex        : 1070,
+            revert        : true, // will cause the event to go back to its
+            revertDuration: 0  //  original position after the drag
+          })
+        })
+      }
+  
+      ini_events($('#external-events div.external-event'))
+  
+      /* initialize the calendar
+      -----------------------------------------------------------------*/
+      var date = new Date()
+      var d    = date.getDate(),
+          m    = date.getMonth(),
+          y    = date.getFullYear()
+  
+      var Calendar = FullCalendar.Calendar;
+      var Draggable = FullCalendar.Draggable;
+  
+      var containerEl = document.getElementById('external-events');
+      var checkbox = document.getElementById('drop-remove');
+      var calendarEl = document.getElementById('calendar');
+  
+      // initialize the external events
+      new Draggable(containerEl, {
+        itemSelector: '.external-event',
+        eventData: function(eventEl) {
+          var color = window.getComputedStyle(eventEl, null).getPropertyValue('background-color');
+          return {
+            title: eventEl.innerText,
+            extendedProps: {
+              backgroundColor: color,
+              borderColor: color,
+              textColor: window.getComputedStyle(eventEl, null).getPropertyValue('color')
+            }
+          };
+        }
+      });
+  
+      var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+        locale: 'es', 
+        headerToolbar: {
+           // Establece el idioma en español
+          left  : 'prev,next today',
+          center: 'title',
+          right : 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        themeSystem: 'bootstrap',
+        events: '/events/',  // Cargar eventos desde el backend
+        editable: true,  // Permitir arrastrar y soltar eventos
+        droppable: true, // Permitir soltar eventos en el calendario
+        eventReceive: function(info) {
+          console.log("Color del evento recibido:", info.event.extendedProps.backgroundColor);
+          var color = info.event.extendedProps.backgroundColor;
+          if (!color) {
+            color = '#3c8dbc';  // Color predeterminado
+          }
+          info.event.setProp('backgroundColor', color);
+          info.event.setProp('borderColor', color);
+          saveEvent(info.event);
+          //eliminar el evento actualizados
+          info.event.remove();
+          calendar.refetchEvents();
+          
+        },
+        
+        eventResize: function(info) {
+          saveEvent(info.event);
+        },
+        
+        eventDrop: function(info) {
+          // Después de mover el evento, actualizamos el ID en el calendario
+          if (!info.event.id) {
+              console.log("El evento no tiene ID.");
+          } else {
+              console.log("Evento después de moverlo: ", info.event.id);
+          }
+      
+          // Forzamos que el calendario lo recargue después de arrastrar
+          info.event.setExtendedProp('id', info.event.id);  // Aseguramos que el ID esté presente
+          saveEvent(info.event);  // Guardamos el evento después de moverlo
+      
+          
+      },
+        
+        // Aquí va el fragmento para eliminar eventos
+        eventClick: function(info) {
+          var confirmed = confirm("¿Estás seguro de que deseas eliminar este evento?");
+          
+          if (confirmed) {
+              fetch('/events/delete/', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ id: info.event.id })
+              })
+              .then(response => response.json())
+              .then(data => {
+                  
+                      // Eliminar el evento visualmente
+                      info.event.remove();
+                      
+                  
+              })
+              .catch(error => {
+                  console.error('Error al eliminar el evento:', error);
+              });
+          }
+        }
+      });
+      
+      calendar.render(); // Renderiza el calendario
+      
+      // Función para guardar eventos en el backend
+      function saveEvent(event) {
+        var eventData = {
+            id: event.id || null,  
+            title: event.title,
+            start: event.startStr,  
+            end: event.endStr || event.startStr,  
+            allDay: event.allDay,
+            backgroundColor: event.extendedProps.backgroundColor, 
+            borderColor: event.extendedProps.borderColor,          
+            textColor: event.extendedProps.textColor               
+        };
+    
+        console.log("Evento enviado al backend:", eventData);  
+    
+        fetch('/events/save/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Respuesta del backend:", data);
+            if (!event.id) {
+                event.setExtendedProp('id', data.id);  
+            }
+        })
+        .catch(error => console.error("Error al enviar evento:", error));
+      }
+      
+      // Función para eliminar eventos
+      function deleteEvent(eventId) {
+        const eventData = { id: eventId };
+      
+        fetch('/events/delete/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(eventData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);  
+            if (data.message === "Evento eliminado con éxito") {
+                calendar.getEventById(eventId).remove();
+            }
+        })
+        .catch(error => {
+            console.error('Error al eliminar el evento:', error);
+        });
+      }
+  
+      // Adding events (this part doesn't change)
+      var currColor = '#3c8dbc' //Red by default
+      $('#color-chooser > li > a').click(function (e) {
+        e.preventDefault()
+        currColor = $(this).css('color')
+        $('#add-new-event').css({
+          'background-color': currColor,
+          'border-color'    : currColor
+        })
+      })
+      $('#add-new-event').click(function (e) {
+        e.preventDefault()
+        var val = $('#new-event').val()
+        if (val.length == 0) {
+          return
+        }
+  
+        var event = $('<div />')
+        event.css({
+          'background-color': currColor,
+          'border-color'    : currColor,
+          'color'           : '#fff'
+        }).addClass('external-event')
+        event.text(val)
+        $('#external-events').prepend(event)
+        ini_events(event)
+        $('#new-event').val('')
+      })
+    })
+  </script>
+{% endblock extra_scripts %}

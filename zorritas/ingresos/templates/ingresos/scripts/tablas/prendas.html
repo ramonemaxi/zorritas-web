@@ -1,0 +1,35 @@
+<script>
+    $(function () {
+        $("#prendas").DataTable({
+            dom: 'flrtp',
+            lengthMenu: [
+                [5, 10, 15], // Valores numéricos
+                ['5', '10', '15',] // Textos a mostrar
+            ],
+            pageLength: 9,
+            language: {
+
+                "search": "Buscar:",
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": false,
+            "info": true,
+            "autoWidth": true,
+            "responsive": false,
+        }).buttons().container().appendTo('#prendas_wrapper .col-md-6:eq(0)')
+
+    })
+</script>

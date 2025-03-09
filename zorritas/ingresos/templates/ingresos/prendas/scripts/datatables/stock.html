@@ -1,0 +1,68 @@
+<script>
+    $(function () {
+        $("#stock").DataTable({
+            dom: 'Bflrtp',
+            lengthMenu: [
+                [5, 10, 15],
+                ['5', '10', '15']
+            ],
+            pageLength: 9,
+            language: {
+                "search": "Buscar:",
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            paging: true,
+            lengthChange: false,
+            searching: true,
+            ordering: false,
+            info: true,
+            autoWidth: false,  // IMPORTANTE: Desactivar autoWidth
+            responsive: false,
+            columnDefs: [
+            { targets: 0, width: "50%" },
+            { targets: 1 },
+            { targets: 2 },
+            { targets: 3},
+            { targets: 4, visible:false , className: "text-center" },
+            { targets: 5, visible:false },
+            { targets: 6, visible:false },
+            { targets: 7, className: "text-center" },
+            { targets: 8, width: "9%", className: "text-center" },
+            { targets: 9, width: "9%" }
+
+        ],
+        buttons: [
+            {
+                extend: 'colvis',
+                text: 'Filtrar Columnas',
+                columns: ':not(:first)'
+            },
+            {
+                extend: 'copy',
+                text: 'Copiar'
+            },
+            {
+                extend: 'excel',
+                text: 'Exportar a Excel'
+            },
+            {
+                extend: 'pdf',
+                text: 'Exportar a PDF'
+            },
+            {
+                extend: 'print',
+                text: 'Imprimir'
+            }
+        ]
+        }).buttons().container().appendTo('#todas_wrapper .col-md-6:eq(0)');
+    });
+</script>

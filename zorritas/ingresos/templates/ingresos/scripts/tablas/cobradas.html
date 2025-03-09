@@ -1,0 +1,43 @@
+<script>
+    $(function () {
+        $('#cobradas')
+        .DataTable({
+          dom: 'fBrtlip',
+          lengthMenu: [
+            [8, 10, 15], // Valores numéricos
+            ['8', '10', '15'] // Textos a mostrar
+          ],
+          pageLength: 8,
+          language: {
+            search: 'Buscar:',
+            lengthMenu: 'Mostrar _MENU_ registros por página',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+            infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+            infoFiltered: '(filtrado de _MAX_ registros totales)',
+            paginate: {
+              first: 'Primero',
+              last: 'Último',
+              next: 'Siguiente',
+              previous: 'Anterior'
+            }
+          },
+    
+          paging: true,
+          lengthChange: true,
+          searching: true,
+          ordering: false,
+          info: true,
+          autoWidth: false,
+          responsive: true,
+          columnDefs: [
+            { width: '700px', targets: 0 }, // Ajusta el ancho de la columna "Descripción"
+            { width: '70px', targets: 1 }, // Ajusta el ancho de "Precio"
+            { width: '1px', targets: 2 } // Ajusta el ancho de "Cobrada"
+          ],
+          buttons: ['copy', 'pdf', 'print', 'colvis']
+        })
+        .buttons()
+        .container()
+        .appendTo('#cobradas_wrapper .col-md-12:eq(0)')
+    });
+</script>
