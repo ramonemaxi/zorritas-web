@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, Pass
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 import datetime
+from django_summernote.widgets import SummernoteWidget
 
 from .models import Clientes, Prendas
 
@@ -130,7 +131,32 @@ class CobrarPrendasForm(forms.Form):
             self.fields['prendas'].queryset = Prendas.objects.filter(fecha_venta__isnull=False, cobrada=False, cliente_id=cliente.id)
 
 
-
+class ClienteAnotacionesForm(forms.ModelForm):
+    class Meta:
+        model = Clientes
+        fields = ['anotaciones']
+        widgets = {
+            'anotaciones': SummernoteWidget(attrs={
+                'summernote': {
+                    'height': '200px',
+                    'width': '100%',
+                    'lang': None,
+                    'iframe': True,
+                    'toolbar': [
+                        ['style', ['style']],             # Estilos de encabezado (h1, h2, etc.)
+                        ['font', ['bold', 'underline', 'clear']], # Negrita, subrayado, limpiar formato
+                        ['fontname', ['fontname']],       # Selección de fuente
+                        ['color', ['color']],             # Selector de color de texto y fondo
+                        ['para', ['ul', 'ol', 'paragraph']], # Listas y párrafo
+                        ['height', ['height']],           # Altura de línea
+                        ['table', ['table']],             # Insertar tabla
+                        ['insert', [None]], # Insertar enlace, imagen, línea horizontal
+                        ['view', ['fullscreen', 'codeview', 'help']], # Ver pantalla completa, código fuente, ayuda
+                    ],
+                    
+                }
+            })
+        }
 
 
 
@@ -180,11 +206,11 @@ class RegistrationForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
     username = UsernameField(widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Username'
+        'placeholder': 'Usuario'
     }))
     password = forms.CharField(max_length=50, widget=forms.PasswordInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Password'
+        'placeholder': 'Contraseña'
     }))
 
 

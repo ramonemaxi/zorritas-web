@@ -1,24 +1,29 @@
 <section class="content">
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card card-outline card-info">
-          <div class="card-header">
-            <h3 class="card-title">
-              Anotaciones
-            </h3>
-          </div>
-          <!-- /.card-header -->
-          <div class="card-body">
-            <textarea id="summernote">
-              Place <em>some</em> <u>text</u> <strong>here</strong>
-            </textarea>
-          </div>
-          
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card card-outline card-info">
+        <div class="card-header">
+          <h3 class="card-title">
+            Anotaciones de <b>{{cliente_actual}}</b>
+          </h3>
         </div>
+        
+        <!-- /.card-header -->
+        <div class="card-body">
+          <form method="post" action="{% if cliente_actual %}{% url 'guardar_anotaciones' cliente_actual.id %}{% endif %}">
+            {% csrf_token %}
+            <div class="form-group">
+              {{ cliente_form_anotaciones.media }}
+              {{ cliente_form_anotaciones.anotaciones|safe }}
+            </div>
+            <div class="modal-footer justify-content-between">
+            <button type="submit" class="btn btn-primary mt-2">Guardar anotaciones</button>
+            </div>
+        </form>
+        </div>
+        
       </div>
-      <!-- /.col-->
     </div>
+    <!-- /.col-->
+  </div>
 </section>
-<script>
-
-</script>

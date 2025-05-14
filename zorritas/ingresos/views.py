@@ -6,6 +6,9 @@ from admin_adminlte.forms import (
     UserSetPasswordForm,
     UserPasswordChangeForm,
 )
+from simple_history.models import HistoricalRecords
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
@@ -17,217 +20,157 @@ from .forms import (
     PrendasFormIngresos,
     PrendasFormUpdateIngresos,
     CobrarPrendasForm,
+    ClienteAnotacionesForm
 )
 from django.urls import reverse_lazy
 from django.urls import reverse
-from django.db.models import Q, Case, When, FloatField
+from django.db.models import Sum, Count, F, ExpressionWrapper, DurationField, Avg
 from django.db.models.functions import Round
 import datetime
+from datetime import date
+
 
 class CLienteDetalle(ListView):
     model = Clientes
     template_name = "ingresos/info_cliente.html"
     context_object_name = "cliente"
 
-    # obtener el contexto
-    def get_queryset(self):
-        return Clientes.objects.filter(id=self.kwargs.get("pk"))
-
-    # cuando metodo post capturar los cheks
-    def post(self, request, *args, **kwargs):
-        # capturar los cheks
-        cheks = request.POST.getlist("cheks")
-        print(cheks)
-        if cheks:
-            # Obtener las prendas seleccionadas de la base de datos
-            prendas_a_cobrar = Prendas.objects.filter(pk__in=cheks)
-
-            # Actualizar el campo 'cobrada' a True para las prendas seleccionadas
-            prendas_a_cobrar.update(cobrada=True)
-
-        return redirect("info_cliente", pk=self.kwargs.get("pk"))
-
     def get_context_data(self, **kwargs):
         # obtener el cliente actual por id de cliente
         context = super().get_context_data(**kwargs)
         # obtener el cliente actual por id de cliente
         context["cliente_actual"] = Clientes.objects.get(id=self.kwargs.get("pk"))
-        # obtener las prendas por id de cliente
-        context['prendas_en_stock'] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), cobrada=False, fecha_venta__isnull=True)
+        prendas = Prendas.objects.filter(
+            cliente_id=context["cliente_actual"])
         
-        context["prendas"] = Prendas.objects.filter(cliente_id=self.kwargs.get("pk"))
+        context['total_efectivo'] = round(sum(prenda.precio_efectivo for prenda in prendas 
+                                if prenda.fecha_venta is not None
+                                and prenda.fecha_cobro is None),2)
         
-        # prendas sin cobrar y con fecha_venta
-        context["prendas_a_cobrar"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), cobrada=False, fecha_venta__isnull=False
-        )
-        # prendas con cobrada en true
-        context["prendas_cobradas"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), cobrada=True
-        )
-        # prendas con cobrada en false
-        context["prendas_no_cobradas"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), cobrada=False
-        )
-        # total prendas sin vender
-        context["total_prendas_sin_vender"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), fecha_venta__isnull=True
-        ).count()
-        # total prendas vendidas
-        context["total_prendas_vendidas"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), fecha_venta__isnull=False
-        ).count()
-        # total de prendas con fecha de venta
-        context["prendas_con_fecha_venta"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), fecha_venta__isnull=False
-        )
-        # total de prendas sin fecha de venta
-        context["prendas_sin_fecha_venta"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), fecha_venta__isnull=True
-        )
-
-        efectivo = 0
-        credito = 0
-        total_efectivo = 0
-        total_credito = 0
-
-        for prenda in context["prendas_no_cobradas"]:
-            if prenda.fecha_venta is not None and prenda.cobrada == False:
-
-                precio = prenda.precio
-
-                if precio <= 10000:
-                    efectivo = round(precio * 0.4, 2)
-                    credito = round(precio * 0.5, 2)
-                    
-                elif 10500 <= precio <= 20000:
-                    efectivo = round(precio * 0.5, 2)
-                    credito = round(precio * 0.5, 2)
-                    
-                elif 20500 <= precio <= 30000:
-                    efectivo = round(precio * 0.6, 2)
-                    credito = round(precio * 0.6, 2)
-                    
-                else:  # precio >= 30000
-                    efectivo = round(precio * 0.7, 2)
-                    credito = round(precio * 0.7, 2)
-                    
-
-                # Sumar al total
-                total_efectivo += efectivo
-                total_credito += credito
-
-        context["total_efectivo"] = total_efectivo
-        context["total_credito"] = total_credito
+        context['total_credito'] = round(sum(prenda.precio_credito for prenda in prendas 
+                                if prenda.fecha_venta is not None
+                                and prenda.fecha_cobro is None),2)
+        ## donnut Ganancias##
+        total_ganancias_vendidas = round(sum(prenda.precio - prenda.precio_efectivo for prenda in prendas 
+                                if prenda.fecha_venta is not None),2)
+        
+        total_ganancias_sin_vender = round(sum(prenda.precio - prenda.precio_efectivo for prenda in prendas 
+                                if prenda.fecha_venta is None),2)
+        context['label_zorritas'] = ['Vendido', 'Por Vender']
+        context['data_zorritas'] = [total_ganancias_vendidas, total_ganancias_sin_vender]
+        ## FIN donnut Ganancias##
+        ## donnut Total##
+        total_cobradas = round(sum(prenda.precio_efectivo for prenda in prendas 
+                                if prenda.fecha_cobro is not None),2)
+        
+        total_sin_cobrar = round(sum(prenda.precio_efectivo for prenda in prendas 
+                                if prenda.fecha_cobro is None),2)
+        context['label_cliente'] = ['Cobrado', 'Por Cobrar']
+        context['data_cliente'] = [total_cobradas, total_sin_cobrar]
+        ## FIN donnut Total##
+        #ganancias por mes#
+        context['label_mes'] = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 
+                                'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 
+                                'Noviembre', 'Diciembre']
+        año_actual = datetime.date.today().year
+        año_anterior = año_actual - 1
+        dos_años = año_actual - 2
+        context['año_actual'] = año_actual
+        context['año_anterior'] = año_anterior
+        context['dos_años'] = dos_años
+        
+        context['data_mes'] = [sum(1 for prenda in prendas 
+                                if prenda.fecha_venta is not None 
+                                and prenda.fecha_venta.month == mes
+                                and prenda.fecha_venta.year == año_actual) for mes in range(1, 13)]
+        context['data_mes_anio_pasado'] = [sum(1 for prenda in prendas 
+                                if prenda.fecha_venta is not None 
+                                and prenda.fecha_venta.month == mes
+                                and prenda.fecha_venta.year == año_anterior) for mes in range(1, 13)]
+        print('mes', context['data_mes'])
+        context['data_mes_2_años'] = [sum(1 for prenda in prendas 
+                                if prenda.fecha_venta is not None 
+                                and prenda.fecha_venta.month == mes
+                                and prenda.fecha_venta.year == dos_años) for mes in range(1, 13)]
+        #FIN ganancias por mes#
+        #porcentaje prendas vendidas vs no vendidas#
+        context['total_prendas'] = sum(1 for prenda in prendas) 
         
         
+        
+        context['total_prendas_vendidas'] = sum(1 for prenda in prendas if prenda.fecha_venta is not None)
 
+        context['total_prendas_sin_vender'] = sum(1 for prenda in prendas if prenda.fecha_venta is None)
+        
+        context['porcentaje_prendas_vendidas'] = round(context['total_prendas_vendidas'] / context['total_prendas'] * 100, 2)
+        
+        context['porcentaje_prendas_sin_vender'] = round(context['total_prendas_sin_vender'] / context['total_prendas'] * 100, 2)
+        context['porcentaje'] = [context['porcentaje_prendas_vendidas'], context['porcentaje_prendas_sin_vender']]
+        print(context['porcentaje'])
+        #FIN porcentaje prendas vendidas vs no vendidas#
+        
         return context
 
 # Create your views here.
-class ListaClientes2(ListView):
+
+class ListaClientes(LoginRequiredMixin,ListView):
     # agregar formulario de cliente
     model = Clientes
-    template_name = "clientes/listarClientes.html"
+    template_name = "ingresos/clientes/listarClientes.html"
     context_object_name = "clientes"
     
     def get_context_data(self, **kwargs):
-        print("clientes2 view accessed")
         context = super().get_context_data(**kwargs)
+        # Consultar directamente el historial, no solo las prendas activas
+        historial_prenda = Prendas.history.filter(cliente_id=self.kwargs.get('pk'))
+
+        # Ordenar por fecha descendente
+        historial_prenda = historial_prenda.order_by('-history_date')
+
+        # Pasar al contexto
+        context["historial_prenda"] = historial_prenda
+
+        
         context['fecha_predeterminada'] = datetime.date.today().strftime('%Y-%m-%d')
-        pestania = self.request.session.get('pestania_activa', 'todas')  # Capturar la pestaña
+        pestania = self.request.session.get('pestania_activa', 'stock')  # Capturar la pestaña
         self.request.session.pop('pestania_activa', None)  # Limpiar la sesión
         context['pestania'] = pestania
+        
         #obtener las prendas por id de cliente
         context['cliente_actual'] = Clientes.objects.filter(id=self.kwargs.get('pk')).first()
-        context['prendas'] = Prendas.objects.filter(cliente_id=self.kwargs.get('pk'))
+        prendas = Prendas.objects.filter(cliente_id=self.kwargs.get('pk'))
+        context['prendas'] = prendas
         # Agregar un formulario vacío para crear nuevos clientes
         context["cliente_form"] = ClienteForm()
         context['prenda_form'] = PrendasFormIngresos(initial={'cliente_id': Clientes.objects.filter(id=self.kwargs.get('pk')).first()})
         context['segment'] = 'ingresos'
+        cliente = Clientes.objects.filter(id=self.kwargs.get('pk')).first()
+        if cliente:
+            context['hay_anotacion'] = bool(cliente.anotaciones and cliente.anotaciones.strip())
+        context["cliente_form_anotaciones"] = ClienteAnotacionesForm(instance=cliente)
+        context['prendas_en_stock'] = [prenda for prenda in prendas if prenda.fecha_venta is None]
         
-        context["prendas_vendidas"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), fecha_venta__isnull=False
-        )
+        context["prendas_cobradas"] = [prenda for prenda in prendas if prenda.fecha_cobro is not  None]
         
-        context['prendas_en_stock'] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), cobrada=False, fecha_venta__isnull=True)
+        context["prendas_no_cobradas"] = [prenda for prenda in prendas if prenda.fecha_cobro is None
+                                          and prenda.fecha_venta is not None]
         
-        context["prendas_cobradas"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), fecha_cobro__isnull=False, fecha_venta__isnull=False)
+        context["total_prendas_vendidas"] = sum(1 for prenda in prendas if prenda.fecha_venta is not None)
         
-        context["prendas_no_cobradas"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), fecha_cobro=None, fecha_venta__isnull=False)
-        
-        context["prendas_a_cobrar"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), cobrada=False, fecha_venta__isnull=False)
-        
-        context["total_prendas_vendidas"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), fecha_venta__isnull=False
-        ).count()
-        
-        context["total_prendas_a_cobrar"] = Prendas.objects.filter(
-            cliente_id=self.kwargs.get("pk"), cobrada=False).count()
+        context["total_prendas_a_cobrar"] = sum(1 for prenda in prendas if prenda.fecha_cobro is None
+                                          and prenda.fecha_venta is not None)
         
         
         
-        efectivo = 0
-        credito = 0
-        total_efectivo = 0
-        total_credito = 0
-
-        for prenda in context["prendas_no_cobradas"]:
-            if prenda.fecha_venta is not None and prenda.cobrada == False:
-
-                precio = prenda.precio
-
-                if precio <= 10000:
-                    efectivo = round(precio * 0.4, 2)
-                    credito = round(precio * 0.5, 2)
-                    
-                elif 10500 <= precio <= 20000:
-                    efectivo = round(precio * 0.5, 2)
-                    credito = round(precio * 0.5, 2)
-                    
-                elif 20500 <= precio <= 30000:
-                    efectivo = round(precio * 0.6, 2)
-                    credito = round(precio * 0.6, 2)
-                    
-                else:  # precio >= 30000
-                    efectivo = round(precio * 0.7, 2)
-                    credito = round(precio * 0.7, 2)
-                    
-
-                # Sumar al total
-                total_efectivo += efectivo
-                total_credito += credito
-
-        context["total_efectivo"] = total_efectivo
-        context["total_credito"] = total_credito
-        print(context["total_efectivo"])
-        print(context["total_credito"])
+        context['total_efectivo'] = round(sum(prenda.precio_efectivo for prenda in prendas 
+                                if prenda.fecha_venta is not None
+                                and prenda.fecha_cobro is None),2)
+        
+        context['total_credito'] = round(sum(prenda.precio_credito for prenda in prendas 
+                                if prenda.fecha_venta is not None
+                                and prenda.fecha_cobro is None),2)
 
 
-        return context
-    
-# Create your views here.
-class ListaClientes(ListView):
-    # agregar formulario de cliente
-    model = Clientes
-    template_name = "ingresos/listar_clientes.html"
-    context_object_name = "clientes"
-
-    def get_context_data(self, **kwargs):
-
-        context = super().get_context_data(**kwargs)
-        #obtener las prendas por id de cliente
-        context['cliente_actual'] = Clientes.objects.filter(id=self.kwargs.get('pk')).first()
-        context['prendas'] = Prendas.objects.filter(cliente_id=self.kwargs.get('pk'))
-        # Agregar un formulario vacío para crear nuevos clientes
-        context["cliente_form"] = ClienteForm()
-        context['prenda_form'] = PrendasFormIngresos(initial={'cliente_id': Clientes.objects.filter(id=self.kwargs.get('pk')).first()})
-        context['segment'] = 'ingresos'
         return context
 
 
@@ -235,7 +178,7 @@ class ListaClientes(ListView):
 class ClienteCreateView(CreateView):
     model = Clientes
     form_class = ClienteForm
-    template_name = "clientes/listarClientes.html"
+    template_name = "ingresos/clientes/listarClientes.html"
 
     def form_valid(self, form):
         # Verifica si el formulario es válido
@@ -250,7 +193,7 @@ class ClienteCreateView(CreateView):
 class ClienteUpdateView(UpdateView):
     model = Clientes
     form_class = ClienteForm
-    template_name = "clientes/listarClientes.html"
+    template_name = "ingresos/clientes/listarClientes.html"
     context_object_name = "cliente"
 
     def form_valid(self, form):
@@ -265,8 +208,8 @@ class ClienteUpdateView(UpdateView):
 
 class ClienteDeleteView(DeleteView):
     model = Clientes
-    template_name = "clientes/eliminarCliente.html"
-    success_url = reverse_lazy("cliente_detalle")
+    template_name = "ingresos/clientes/eliminarCliente.html"
+    success_url = reverse_lazy("clientes_lista")
 
     def form_valid(self, form):
         print(messages.error)
@@ -285,7 +228,7 @@ class PrendaCreateView(CreateView):
         # Verifica si el formulario es válido
         if form.is_valid():
             self.object = form.save()
-            print(self.object.cliente_id_id)
+            
             # redirigir a detalle_cliente con el id del cliente creado
             return redirect("cliente_detalle", pk=self.object.cliente_id_id)
         else:
@@ -385,9 +328,50 @@ def confirmar_descobro(request, pk):
         return redirect("cliente_detalle", pk=prenda.cliente_id.pk)
     return render(request, 'ingresos/prendas/confirmar_descobro.html', {'prenda': prenda})
 
+def guardar_anotaciones(request, cliente_id):
+    cliente = get_object_or_404(Clientes, id=cliente_id)
+    form = ClienteAnotacionesForm(request.POST, instance=cliente)
+    if form.is_valid():
+        request.session['pestania_activa'] = 'anotaciones'
+        form.save()
+    return redirect('cliente_detalle', pk=cliente.id)
+
+class PrendaUpdateViewTodas(UpdateView):
+    model = Prendas
+    form_class = PrendasFormUpdateIngresos
+    context_object_name = "prenda"
+
+    def get_initial(self):
+        # Establece el valor inicial de cliente_id al cliente actual de la prenda
+        initial = super().get_initial()
+        initial["cliente_id"] = self.object.cliente_id  # Mantiene el cliente asociado
+        return initial
+
+    def form_valid(self, form):
+        
+        self.object = form.save()
+        self.request.session['pestania_activa'] = 'todas'
+        
+        # No es necesario cambiar el cliente_id, se mantiene el valor del cliente ya asociado
+        
+        return redirect("cliente_detalle", pk=self.object.cliente_id.pk)
+
+    def form_invalid(self, form):
+        self.request.session['pestania_activa'] = 'todas'
+        
+        print(form.errors)
+        return redirect("cliente_detalle", pk=self.object.cliente_id.pk)
 
 
-
+# eliminar prenda
+class PrendaDeleteViewTodas(DeleteView):
+    model = Prendas
+    template_name = "prendas/listarClientes.html"
+    
+    # redirigir a lista_prendas
+    def get_success_url(self):
+        self.request.session['pestania_activa'] = 'todas'
+        return redirect("cliente_detalle", kwargs={"pk": self.object.cliente_id.pk})
 
 
 
@@ -450,25 +434,24 @@ def register_v2(request):
 class UserLoginView(auth_views.LoginView):
     template_name = "accounts/login.html"
     form_class = LoginForm
-    success_url = "/clientes2"
-    # agregar esto print(self.request.GET.get('next')) dentro del metodo get
-    def get(self, request, *args, **kwargs):
-        print(self.request.GET.get('next'))
-        print(self.success_url)
-        return super().get(request, *args, **kwargs) # Llamar al método get original
-
+    def get_success_url(self):
+        return reverse_lazy("clientes_lista")
+    
+class MinimalLoginView(LoginView):
+    template_name = "accounts/login.html"
+    success_url = reverse_lazy("clientes_lista")
 
 
 class UserLoginViewV1(auth_views.LoginView):
     template_name = "pages/examples/login.html"
     form_class = LoginForm
-    success_url = "/clientes2"
+    success_url = reverse_lazy("clientes_lista")
 
 
 class UserLoginViewV2(auth_views.LoginView):
     template_name = "pages/examples/login-v2.html"
     form_class = LoginForm
-    success_url = "/clientes2"
+    success_url = "/clientes"
 
 
 class UserPasswordResetView(auth_views.PasswordResetView):
@@ -508,7 +491,7 @@ class UserPasswordChangeViewV2(auth_views.PasswordChangeView):
 
 def user_logout_view(request):
     logout(request)
-    return redirect("/accounts/login/")
+    return redirect("index")
 
 
 # pages
@@ -538,9 +521,7 @@ def widgets(request):
 # EXAMPLES
 
 
-def examples_calendar(request):
-    context = {"parent": "", "segment": "calendar"}
-    return render(request, "calendar/calendar.html", context)
+
 
 
 def examples_gallery(request):

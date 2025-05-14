@@ -37,7 +37,7 @@ SECRET_KEY = 'django-insecure-@z@66ak1n3)qw#mk6k6knhbel3pdyx5i4log1e+x(wkv_huy%l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['zorritas.test','localhost']
 
 
 # Application definition
@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'calendario',
     'dashboard',
     'ventas',
+    'emprendimientos',
+    'django_summernote',
     'simple_history',
 ]
 
@@ -94,12 +96,26 @@ WSGI_APPLICATION = 'zorritas.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'zorritas',
+        'USER': 'maca',
+        'PASSWORD': 'M4ca1977',
+        'HOST': 'localhost',  # o la IP del servidor
+        'PORT': '3306',        # puerto por defecto
+        'OPTIONS': {
+            'charset': 'utf8mb4',  # para soportar emojis y caracteres especiales
+        }
     }
 }
+
 
 
 # Password validation
@@ -135,8 +151,8 @@ LANGUAGE_CODE = 'es-us'
 
 USE_I18N = True
 
-
-
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = False 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -147,3 +163,5 @@ USE_I18N = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SUMMERNOTE_THEME = 'bs4'  # Show summernote with Bootstrap4

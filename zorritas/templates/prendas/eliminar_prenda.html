@@ -1,8 +1,8 @@
 <div class="modal fade" id="deletePrendaModal-{{ prenda.pk }}">
     <div class="modal-dialog">
-      <div class="modal-content bg-danger">
-        <div class="modal-header">
-          <h4 class="modal-title">Eliminar Prenda</h4>
+      <div class="modal-content card-danger">
+        <div class="card-header">
+          <h4 class="card-title">Eliminar Prenda</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -13,8 +13,8 @@
           <form method="post" action="{% url 'eliminar_prenda' prenda.pk %}">
             {% csrf_token %}
             <div class="modal-footer justify-content-between">
-              <button type="button" class="btn btn-outline-light" data-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-outline-light">Aceptar</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-danger">Aceptar</button>
             </div>
           </form>
 

@@ -1,6 +1,7 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 from datetime import date
+from datetime import datetime
 # Create your models here.
 
 
@@ -10,6 +11,7 @@ class Clientes(models.Model):
     telefono = models.CharField(max_length=20, null=True, blank=True)
     instagram = models.CharField(max_length=100, null=True, blank=True)
     alias = models.CharField(max_length=100, null=True, blank=True)
+    anotaciones = models.TextField(blank=True, null=True)
     history = HistoricalRecords()  # Habilita el historial
     
     def __str__(self):
@@ -24,9 +26,9 @@ class Prendas(models.Model):
     descripcion = models.CharField(max_length=100)
     precio = models.IntegerField()
     cobrada = models.BooleanField(default=False, null=True, blank=True)
-    fecha_venta = models.DateField(null=True, blank=True)
-    fecha_ingreso = models.DateField(null=True, blank=True)
     fecha_cobro = models.DateField(null=True, blank=True)
+    fecha_ingreso = models.DateField(null=True, blank=True)
+    fecha_venta = models.DateField(null=True, blank=True)
     history = HistoricalRecords()
     
     def __str__(self):
@@ -65,8 +67,24 @@ class Prendas(models.Model):
             return ""  # O algún otro valor por defecto, como "Sin fecha"
     #sumar todas las prendas
     def total_prendas():
-        return Prendas.objects.all().count()  # Suma el número de prendas en la base de datos
+        return Prendas.objects.filter(fecha_venta__isnull=True).count()  # Suma el número de prendas en la base de datos
     
+    def total_prendas_vendidas_hoy():
+        hoy = datetime.now().date()
+        return Prendas.objects.filter(fecha_venta=hoy).count()  # Suma el número de prendas vendidas hoy
+
+    @property
+    def ganancia_efectivo(self):
+        precio = self.precio
+        if precio <= 10000:
+            return round(precio * 0.6, 2)
+        elif 10500 <= precio <= 20000:
+            return round(precio * 0.5, 2)
+        elif 20500 <= precio <= 30000:
+            return round(precio * 0.4, 2)
+        else:  # precio >= 30000
+            return round(precio * 0.3, 2)
+        
     @property
     def precio_efectivo(self):
         precio = self.precio

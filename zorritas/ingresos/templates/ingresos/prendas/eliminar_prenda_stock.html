@@ -1,20 +1,22 @@
 <div class="modal fade" id="deletePrendaModalStock-{{ prenda.pk }}">
-    <div class="modal-dialog">
-      <div class="modal-content bg-danger">
-        <div class="modal-header">
-          <h4 class="modal-title">Eliminar Prenda</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
+  <div class="modal-dialog">
+    <div class="modal-content card-danger">
+      <div class="card-header">
+        <h4 class="card-title">ELIMINAR PRENDA </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
         <div class="modal-body" Styles >
 
-          <h2>¿Estás seguro de que deseas eliminar a {{ prenda.descripcion }}?</h2>
+          <h2>¿Estás seguro de que deseas eliminar la prenda?</h2>
+          <br>
+          <h2><strong class="btn btn-block btn-outline-danger btn-lg">{{ prenda.descripcion }}</strong></h2>
           <form method="post" action="{% url 'eliminar_prenda' prenda.pk %}">
             {% csrf_token %}
             <div class="modal-footer justify-content-between">
-              <button type="button" class="btn btn-outline-light" data-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-outline-light">Aceptar</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-danger">Aceptar</button>
             </div>
           </form>
 

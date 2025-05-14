@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from .models import Event
 import json
 from django.http import JsonResponse
@@ -6,7 +7,9 @@ import datetime
 from django.utils import timezone
 
 # Create your views here.
-
+def examples_calendar(request):
+    context = {"parent": "", "segment": "calendar"}
+    return render(request, "calendario/calendar.html", context)
 # Create your views here.
 def event_list(request):
     events = list(Event.objects.values("id", "title", "start", "end", "backgroundColor", "borderColor", "allDay"))

@@ -2,206 +2,193 @@
 {% load static %}
 
 {% block title %}
-  Detalle
+Detalle
 {% endblock %}
 {% block extrastyle %}
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-  <link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}" />
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-  <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
-  <link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}" />
-  <link rel="stylesheet" href="{% static 'dist/fontawesome/css/fontawesome.css' %}" />
-  <link rel="stylesheet" href="{% static 'dist/fontawesome/css/brands.css' %}" />
-  <link rel="stylesheet" href="{% static 'dist/fontawesome/css/solid.css' %}" />
-  <link rel="stylesheet" href="{% static 'dist/fontawesome/css/sharp-thin.css' %}" />
-  <link rel="stylesheet" href="{% static 'dist/fontawesome/css/duotone-thin.css' %}" />
-  <link rel="stylesheet" href="{% static 'dist/fontawesome/css/sharp-duotone-thin.css' %}" />
-  <style>
-  table.dataTable tbody th, 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+<link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}" />
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}" />
+<link rel="stylesheet" href="{% static 'dist/fontawesome/css/fontawesome.css' %}" />
+<link rel="stylesheet" href="{% static 'dist/fontawesome/css/brands.css' %}" />
+<link rel="stylesheet" href="{% static 'dist/fontawesome/css/solid.css' %}" />
+<link rel="stylesheet" href="{% static 'dist/fontawesome/css/sharp-thin.css' %}" />
+<link rel="stylesheet" href="{% static 'dist/fontawesome/css/duotone-thin.css' %}" />
+<link rel="stylesheet" href="{% static 'dist/fontawesome/css/sharp-duotone-thin.css' %}" />
+<style>
+  table.dataTable tbody th,
   table.dataTable tbody td {
     padding: 3px 6px !important;
   }
 </style>
-  {% endblock %}
+{% endblock %}
 {% block bodyclass %}
-  hold-transition sidebar-mini
+hold-transition sidebar-mini
 {% endblock %}
 {% block content %}
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-sm-9">
-            <h1>
-              {{ cliente_actual.nombre }}
-              <i class="btn btn-outline-warning btn-flat fa-solid fa-pen-to-square " data-toggle="modal" data-target="#editModal-{{ cliente_actual.pk }}"></i>
-              <i class="btn btn-outline-danger btn-flat fa-solid fa-trash-can" data-toggle="modal" data-target="#deleteModal-{{ cliente_actual.pk }}"></i>
-            </h1> 
-          </div>
-            
-
-          <div class="col-sm-3">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item">
-                <a href="{% url 'lista_clientes' %}">Ingresos</a>
-              </li>
-              <li class="breadcrumb-item active">{{ cliente_actual.nombre }}</li>
-            </ol>
-          </div>
-          <!-- /.col -->
-        </div>
-      </div>
-      <!-- /.container-fluid -->
-    </section>
-
-    <section>
-      <!-- totales -->
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-3 col-sm-6 col-12">
-            <div class="info-box">
-              <span class="info-box-icon bg-info"><i class="fa-regular fa-money-bill-1"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">Efectivo</span>
-                <span class="info-box-number">{{ total_efectivo }}</span>
-              </div>
-              <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-          </div>
-          <!-- /.col -->
-          <div class="col-md-3 col-sm-6 col-12">
-            <div class="info-box">
-              <span class="info-box-icon bg-success"><i class="fa-regular fa-credit-card"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">Credito</span>
-                <span class="info-box-number">{{ total_credito }}</span>
-              </div>
-              <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-          </div>
-          <!-- /.col -->
-          <div class="col-md-3 col-sm-6 col-12">
-            <div class="info-box">
-              <span class="info-box-icon bg-success"><i class="fa-solid fa-cart-shopping"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">Prendas Vendidas</span>
-                <span class="info-box-number">{{ total_prendas_vendidas }}</span>
-              </div>
-              <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-          </div>
-          <!-- /.col -->
-          <div class="col-md-3 col-sm-6 col-12">
-            <div class="info-box">
-              <span class="info-box-icon bg-danger"><i class="fa-solid fa-cart-shopping"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">Prendas No Vendidas</span>
-                <span class="info-box-number">{{ total_prendas_sin_vender }}</span>
-              </div>
-              <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-          </div>
-          <!-- /.col -->
-        </div>
-      </div>
-      <!-- /totales -->
-    </section>
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
     <div class="container-fluid">
-      <div class="row mb-2">
-        <!-- Correo electrónico -->
-        <div class="col-md-3">
-          <li class="btn btn-block btn-outline-info btn-flat" data-toggle="tooltip" title="E-mail">
-            <i class="fa-regular fa-envelope"></i> {% if cliente_actual %}{{ cliente_actual.email }}{% endif %}
-          </li>
+      <div class="row">
+        <div class="col-sm-9">
+          <h1>
+            {{ cliente_actual.nombre }}
+          </h1>
         </div>
 
-        <!-- Teléfono -->
-        <div class="col-md-3">
-          <li class="btn btn-block btn-outline-success btn-flat" data-toggle="tooltip" title="Telefono">
-            <i class="fa-solid fa-mobile-screen"></i> {% if cliente_actual %}{{ cliente_actual.telefono }}{% endif %}
-          </li>
-        </div>
 
-        <!-- Instagram -->
-        <div class="col-md-3">
-          <li class="btn btn-block btn-outline-dark" data-toggle="tooltip" title="Instagram">
-            <i class="fa-brands fa-instagram"></i> {% if cliente_actual %}{{ cliente_actual.instagram }}{% endif %}
-          </li>
+        <div class="col-sm-3">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item">
+              <a href="{% url 'cliente_detalle' cliente_actual.pk %}">Lista({{cliente_actual.nombre}})</a>
+            </li>
+            <li class="breadcrumb-item active">Info({{ cliente_actual.nombre }})</li>
+          </ol>
         </div>
-
-        <!-- Alias -->
-        <div class="col-md-3">
-          <li class="btn btn-block btn-outline-primary btn-flat" data-toggle="tooltip" title="Alias">
-            <i class="fa-solid fa-money-bill-transfer"></i> {% if cliente_actual %}{{ cliente_actual.alias }}{% endif %}
-          </li>
-        </div>
+        <!-- /.col -->
       </div>
     </div>
-    <!-- Main content -->
+    <!-- /.container-fluid -->
+  </section>
+
+  <section>
+    <!-- totales -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fa-regular fa-money-bill-1"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Efectivo</span>
+              <span class="info-box-number">{{ total_efectivo }}</span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="info-box">
+            <span class="info-box-icon bg-success"><i class="fa-regular fa-credit-card"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Credito</span>
+              <span class="info-box-number">{{ total_credito }}</span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="info-box">
+            <span class="info-box-icon bg-success"><i class="fa-solid fa-cart-shopping"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Prendas Vendidas</span>
+              <span class="info-box-number">{{ total_prendas_vendidas }}</span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="info-box">
+            <span class="info-box-icon bg-danger"><i class="fa-solid fa-cart-shopping"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Prendas No Vendidas</span>
+              <span class="info-box-number">{{ total_prendas_sin_vender }}</span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+      </div>
+    </div>
+    <!-- /totales -->
+  </section>
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <!-- Correo electrónico -->
+      <div class="col-md-3">
+        <li class="btn btn-block btn-outline-info btn-flat" data-toggle="tooltip" title="E-mail">
+          <i class="fa-regular fa-envelope"></i> {% if cliente_actual %}{{ cliente_actual.email }}{% endif %}
+        </li>
+      </div>
+
+      <!-- Teléfono -->
+      <div class="col-md-3">
+        <li class="btn btn-block btn-outline-success btn-flat" data-toggle="tooltip" title="Telefono">
+          <i class="fa-solid fa-mobile-screen"></i> {% if cliente_actual %}{{ cliente_actual.telefono }}{% endif %}
+        </li>
+      </div>
+
+      <!-- Instagram -->
+      <div class="col-md-3">
+        <li class="btn btn-block btn-outline-dark" data-toggle="tooltip" title="Instagram">
+          <i class="fa-brands fa-instagram"></i> {% if cliente_actual %}{{ cliente_actual.instagram }}{% endif %}
+        </li>
+      </div>
+
+      <!-- Alias -->
+      <div class="col-md-3">
+        <li class="btn btn-block btn-outline-primary btn-flat" data-toggle="tooltip" title="Alias">
+          <i class="fa-solid fa-money-bill-transfer"></i> {% if cliente_actual %}{{ cliente_actual.alias }}{% endif %}
+        </li>
+      </div>
+    </div>
+  </div>
+  <!-- Main content -->
+  <div class="row">
     <div class="col-12 col-sm-12">
       <div class="card card-primary card-outline card-tabs">
         <div class="card-header p-0 pt-1 border-bottom-0">
           <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+            
             <li class="nav-item">
-              <a class="nav-link active" id="custom-tabs-three-ingresos-tab" data-toggle="pill" href="#custom-tabs-three-ingresos" role="tab" aria-controls="custom-tabs-three-ingresos" aria-selected="true">Ingresos</a>
+              <a class="nav-link show active" id="custom-tabs-three-Datos-Económicos-tab" data-toggle="pill"
+                href="#custom-tabs-three-Datos-Económicos" role="tab" aria-controls="custom-tabs-three-Datos-Económicos"
+                aria-selected="false">Datos Económicos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="custom-tabs-three-home-tab" data-toggle="pill" href="#custom-tabs-three-home" role="tab" aria-controls="custom-tabs-three-home" aria-selected="true">Cobradas</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#custom-tabs-three-profile" role="tab" aria-controls="custom-tabs-three-profile" aria-selected="false">No Cobradas</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" id="custom-tabs-three-messages-tab" data-toggle="pill" href="#custom-tabs-three-messages" role="tab" aria-controls="custom-tabs-three-messages" aria-selected="false">Cobrar</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" id="custom-tabs-three-settings-tab" data-toggle="pill" href="#custom-tabs-three-settings" role="tab" aria-controls="custom-tabs-three-settings" aria-selected="false">Settings</a>
+              <a class="nav-link" id="custom-tabs-three-Rendimiento-de-Ventas-tab" data-toggle="pill"
+                href="#custom-tabs-three-Rendimiento-de-Ventas" role="tab" aria-controls="custom-tabs-three-Rendimiento-de-Ventas"
+                aria-selected="false">Rendimiento de Ventas</a>
             </li>
           </ul>
         </div>
         <div class="card-body">
           <div class="tab-content" id="custom-tabs-three-tabContent">
-            <div class="tab-pane fade show active" id="custom-tabs-three-ingresos" role="tabpanel" aria-labelledby="custom-tabs-three-ingresos-tab">
-              {% include 'ingresos/prendas/listar_prendas.html' %}
+            <div class="tab-pane fade show active" id="custom-tabs-three-Datos-Económicos" role="tabpanel"
+              aria-labelledby="custom-tabs-three-Datos-Económicos-tab">
+              {% include "ingresos/charts/total-generado.html" %}
+              {% include "ingresos/charts/ventas_mensuales.html" %}
             </div>
-            <div class="tab-pane fade" id="custom-tabs-three-home" role="tabpanel" aria-labelledby="custom-tabs-three-home-tab">
-              {% include 'clientes/tablas/cobradas.html' %}
+            <div class="tab-pane fade" id="custom-tabs-three-Rendimiento-de-Ventas" role="tabpanel"
+              aria-labelledby="custom-tabs-three-Rendimiento-de-Ventas-tab">
+             {% include "ingresos/charts/rendimiento_ventas.html" %}
             </div>
-            <div class="tab-pane fade" id="custom-tabs-three-profile" role="tabpanel" aria-labelledby="custom-tabs-three-profile-tab">
-              {% include 'clientes/tablas/no_cobradas.html' %}
-            </div>
-            <div class="tab-pane fade" id="custom-tabs-three-messages" role="tabpanel" aria-labelledby="custom-tabs-three-messages-tab">
-              {% include 'clientes/cobrar_prendas.html' %}
-            </div>
-            <div class="tab-pane fade" id="custom-tabs-three-settings" role="tabpanel" aria-labelledby="custom-tabs-three-settings-tab">Pellentesque vestibulum commodo nibh nec blandit. Maecenas neque magna, iaculis tempus turpis ac, ornare sodales tellus. Mauris eget blandit dolor. Quisque tincidunt venenatis vulputate. Morbi euismod molestie tristique. Vestibulum consectetur dolor a vestibulum pharetra. Donec interdum placerat urna nec pharetra. Etiam eget dapibus orci, eget aliquet urna. Nunc at consequat diam. Nunc et felis ut nisl commodo dignissim. In hac habitasse platea dictumst. Praesent imperdiet accumsan ex sit amet facilisis.</div>
           </div>
         </div>
         <!-- /.card -->
       </div>
     </div>
-    <!-- /.content -->
   </div>
-  <!--INCLUDES-->
-  {% include "ingresos/editar_cliente.html" %}
-  {% include "ingresos/prendas/crear_prenda.html" %}
-
-  <!--FIN INCLUDES-->
-{% endblock %}
-{% block extra_scripts %}
+  <!-- /.content -->
+ 
+  {% endblock %}
+  {% block extra_scripts %}
   <!-- DataTables & Plugins -->
-  
+
   <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
   <script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
   <script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
@@ -214,11 +201,10 @@
   <script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
   <script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
   <script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+  <script src="{% static 'plugins/chart.js/Chart.min.js' %}"></script>
   <!-- Page specific script -->
   {% include 'ingresos/scripts/tablas/prendas.html' %}
   {% include 'ingresos/scripts/tablas/no_cobradas.html' %}
   {% include 'ingresos/scripts/tablas/cobradas.html' %}
-  <script>
-    
-</script>
-{% endblock %}
+ 
+  {% endblock %}

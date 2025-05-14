@@ -1,5 +1,5 @@
 {% extends 'layouts/auth_base.html' %}
-
+{% load static %}
 {% block title %} Log in {% endblock title %}
 
 {% block bodyclass %} login-page {% endblock bodyclass %}
@@ -7,12 +7,15 @@
 {% block content %}
 <div class="login-box">
   <div class="login-logo">
-    <a href="/"><b>Admin</b>LTE</a>
+    <a href="/"><b>Zorritas</b> 
+      <img src="{% static 'dist/img/AdminLTELogo.png' %}" alt="AdminLTE Logo" width="50" height="50" class="brand-image"
+      style="opacity: .8">
+    </a>
   </div>
   <!-- /.login-logo -->
   <div class="card">
     <div class="card-body login-card-body">
-      <p class="login-box-msg">Sign in to start your session</p>
+      <p class="login-box-msg">Inicia sesion para Empezar</p>
 
       <form method="post">
         {% csrf_token %}
@@ -39,19 +42,19 @@
             <div class="icheck-primary">
               <input type="checkbox" id="remember">
               <label for="remember">
-                Remember Me
+                Recordar mis datos
               </label>
             </div>
           </div>
           <!-- /.col -->
           <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
           </div>
           <!-- /.col -->
         </div>
       </form>
 
-      
+      <!--
       <div class="social-auth-links text-center mb-3">
         <p>- OR -</p>
         <a href="#" class="btn btn-block btn-primary">
@@ -61,13 +64,11 @@
           <i class="fab fa-google-plus mr-2"></i> Sign in using Google+
         </a>
       </div>
-      
+    -->
       <!-- /.social-auth-links -->
 
       <p class="mt-5 mb-2 text-center">
-        <a href="{% url 'password_reset' %}">Reset Pass</a>
-        &bull;
-        <a href="{% url 'register' %}" class="text-center">Sign UP</a>
+        <a href="{% url 'register' %}" class="text-center">Registro</a>
       </p>
     </div>
     <!-- /.login-card-body -->

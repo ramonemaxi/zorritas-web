@@ -69,6 +69,7 @@ table.dataTable tfoot {
 });
 </script>
 {% endif %}
+
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -263,11 +264,9 @@ table.dataTable tfoot {
     <div class="card card-primary card-outline card-outline-tabs">
         <div class="card-header p-0 border-bottom-0">
             <ul style="padding-bottom: 18px;" class="nav nav-tabs d-flex align-items-center w-100" id="custom-tabs-three-tab" role="tablist">
+                
                 <li class="nav-item">
-                    <a class="nav-link {% if pestania == 'todas' %}active{% endif %}" id="custom-tabs-three-todas-tab" data-toggle="pill" href="#custom-tabs-three-todas" role="tab" aria-controls="custom-tabs-three-todas" aria-selected="true">Todas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if pestania == 'stock' %}active{% endif %}" id="custom-tabs-three-stock-tab" data-toggle="pill" href="#custom-tabs-three-stock" role="tab" aria-controls="custom-tabs-three-stock" aria-selected="false">Stock</a>
+                    <a class="nav-link {% if pestania == 'stock' %}active{% endif %}" id="custom-tabs-three-stock-tab" data-toggle="pill" href="#custom-tabs-three-stock" role="tab" aria-controls="custom-tabs-three-stock" aria-selected="false">Stock/No Vendido</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if pestania == 'no_cobrada' or pestania == 'cobrada' %}active %}{% endif %}" id="custom-tabs-three-vendidas-tab" data-toggle="pill" href="#custom-tabs-three-vendidas" role="tab" aria-controls="custom-tabs-three-vendidas" aria-selected="false">Vendidas</a>
@@ -275,6 +274,14 @@ table.dataTable tfoot {
                 <li class="nav-item">
                     <a class="nav-link" id="custom-tabs-three-settings-tab" data-toggle="pill" href="#custom-tabs-three-settings" role="tab" aria-controls="custom-tabs-three-settings" aria-selected="false">Settings</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link {% if pestania == 'todas' %}active{% endif %}" id="custom-tabs-three-todas-tab" data-toggle="pill" href="#custom-tabs-three-todas" role="tab" aria-controls="custom-tabs-three-todas" aria-selected="true">Todas</a>
+                </li>
+                {% if request.user.is_superuser%}
+                <li class="nav-item">
+                  <a class="nav-link" id="custom-tabs-three-historial-tab" data-toggle="pill" href="#custom-tabs-three-historial" role="tab" aria-controls="custom-tabs-three-historial" aria-selected="false">Historial</a>
+              </li>
+              {% endif %}
                 <li href="#" data-toggle="tooltip" title="Agregar Prenda" class="ml-auto btn btn-flat btn-outline-success" >
                     <i class="fa-solid fa-shirt" data-toggle="modal" data-target="#crearPrendaModal"></i>
                 </li>
@@ -291,14 +298,14 @@ table.dataTable tfoot {
                 <div class="tab-pane fade {% if pestania == 'no_cobrada' or pestania == 'cobrada' %}show active %}{% endif %} " id="custom-tabs-three-vendidas" role="tabpanel" aria-labelledby="custom-tabs-three-vendidas-tab">
                     <ul style="padding-bottom: 18px;" class="nav nav-tabs  ml-auto " id="vendidas-tab" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link {% if pestania == 'cobrada' or pestania == 'todas' %} active{% endif %}" id="vendidas-cobradas-tab" data-toggle="pill" href="#vendidas-cobradas" role="tab" aria-controls="vendidas-cobradas" aria-selected="false">Cobradas</a>
+                            <a class="nav-link {% if pestania == 'cobrada' or pestania == 'stock' %} active{% endif %}" id="vendidas-cobradas-tab" data-toggle="pill" href="#vendidas-cobradas" role="tab" aria-controls="vendidas-cobradas" aria-selected="false">Cobradas</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if pestania == 'no_cobrada' %} active {% endif %}" id="vendidas-no-cobradas-tab" data-toggle="pill" href="#vendidas-no-cobradas" role="tab" aria-controls="vendidas-no-cobradas" aria-selected="false">No Cobradas</a>
                         </li>
                     </ul>
                     <div class="tab-content" id="vendidas-tabContent">
-                        <div class="tab-pane fade {% if pestania == 'cobrada' or pestania == 'todas' %}show active{% endif %}" id="vendidas-cobradas" role="tabpanel" aria-labelledby="vendidas-cobradas-tab">
+                        <div class="tab-pane fade {% if pestania == 'cobrada' or pestania == 'stock' %}show active{% endif %}" id="vendidas-cobradas" role="tabpanel" aria-labelledby="vendidas-cobradas-tab">
                             {% include 'ingresos/prendas/cobradas_prendas.html' %}
                         </div>
                         <div class="tab-pane fade {% if pestania == 'no_cobrada' %}show active{% endif %}" id="vendidas-no-cobradas" role="tabpanel" aria-labelledby="vendidas-no-cobradas-tab">
@@ -306,9 +313,13 @@ table.dataTable tfoot {
                         </div>
                     </div>
                 </div>
+                
                 <div class="tab-pane fade" id="custom-tabs-three-settings" role="tabpanel" aria-labelledby="custom-tabs-three-settings-tab">
                     {% include 'ingresos/prendas/editor.html' %}
                 </div>
+                <div class="tab-pane fade" id="custom-tabs-three-historial" role="tabpanel" aria-labelledby="custom-tabs-three-historial-tab">
+                  {% include 'ingresos/prendas/historial.html' %}
+              </div>
             </div>
         </div>
     </div>
@@ -323,10 +334,10 @@ table.dataTable tfoot {
     <!-- /.content -->
   </div>
   
-  {% include "clientes/crear_cliente.html" %}
+  {% include "ingresos/clientes/crear_cliente.html" %}
   {% if cliente_actual %}
-  {% include "clientes/editar_cliente.html" %} 
-  {% include "clientes/eliminar_cliente.html" %}
+  {% include "ingresos/clientes/editar_cliente.html" %} 
+  {% include "ingresos/clientes/eliminar_cliente.html" %}
   {% include "ingresos/prendas/crear_prenda.html" %}
   {% endif %}
   
@@ -357,6 +368,7 @@ table.dataTable tfoot {
 {% include "ingresos/prendas/scripts/datatables/cobradas.html" %}
 {% include "ingresos/prendas/scripts/datatables/no_cobradas.html" %}
 {% include "ingresos/prendas/scripts/datatables/vendidas.html" %}
+{% include "ingresos/prendas/scripts/datatables/historial_script.html" %}
 
 
 <!-- Page specific script -->
