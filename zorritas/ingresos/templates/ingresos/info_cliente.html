@@ -5,11 +5,11 @@
 Detalle
 {% endblock %}
 {% block extrastyle %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
 <link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+<link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}" />
 <link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}" />
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
 <link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}" />
 <link rel="stylesheet" href="{% static 'dist/fontawesome/css/fontawesome.css' %}" />
@@ -17,8 +17,9 @@ Detalle
 <link rel="stylesheet" href="{% static 'dist/fontawesome/css/solid.css' %}" />
 <link rel="stylesheet" href="{% static 'dist/fontawesome/css/sharp-thin.css' %}" />
 <link rel="stylesheet" href="{% static 'dist/fontawesome/css/duotone-thin.css' %}" />
-<link rel="stylesheet" href="{% static 'dist/fontawesome/css/sharp-duotone-thin.css' %}" />
-<style>
+<link rel="stylesheet" href="{% static 'dist/fontawesome/css/sharp-duotone-thin.css' %}" /><link rel="stylesheet" href="{% static 'dist/fontawesome/css/all.css' %}" />
+<link rel="stylesheet" href="{% static 'plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}" />
+    <style>
   table.dataTable tbody th,
   table.dataTable tbody td {
     padding: 3px 6px !important;
@@ -183,6 +184,8 @@ hold-transition sidebar-mini
       </div>
     </div>
   </div>
+</div>
+
   <!-- /.content -->
  
   {% endblock %}
@@ -192,7 +195,6 @@ hold-transition sidebar-mini
   <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
   <script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
   <script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
-  <link rel="stylesheet" href="{% static 'plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}" />
   <script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
   <script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
   <script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>

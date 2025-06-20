@@ -17,6 +17,7 @@ class Clientes(models.Model):
     def __str__(self):
         return self.nombre
     
+    @staticmethod
     def total_clientes():
         return Clientes.objects.all().count()  # Suma el número de clientes en la base de datos
 
@@ -33,7 +34,18 @@ class Prendas(models.Model):
     
     def __str__(self):
         return self.descripcion
-    
+
+    def tiempo_desde_ultima_venta(self):
+        if self.fecha_venta:
+            dias_pasados = (date.today() - self.fecha_venta).days
+            if dias_pasados == 0:
+                return "Hoy"
+            elif dias_pasados == 1:
+                return "Ayer"
+            else:
+                return f"Hace {dias_pasados} días"
+        return "No vendida"
+
     def marcar_como_vendida(self):
         self.fecha_venta = date.today()
         self.save()
@@ -66,9 +78,11 @@ class Prendas(models.Model):
         else:
             return ""  # O algún otro valor por defecto, como "Sin fecha"
     #sumar todas las prendas
+    @staticmethod
     def total_prendas():
         return Prendas.objects.filter(fecha_venta__isnull=True).count()  # Suma el número de prendas en la base de datos
     
+    @staticmethod
     def total_prendas_vendidas_hoy():
         hoy = datetime.now().date()
         return Prendas.objects.filter(fecha_venta=hoy).count()  # Suma el número de prendas vendidas hoy
