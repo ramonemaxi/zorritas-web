@@ -1,0 +1,71 @@
+<section class="content">
+
+  <table id="historial" class="table table-bordered table-striped">
+    <thead>
+      <tr>
+
+        <th>Descripcion</th>
+        <th>Precio</th>
+        <th>Fecha de Venta</th>
+        <th>Fecha de Cobro</th>
+        <th>Fecha de Ingreso</th>
+        <th>Accion</th>
+        <th>Fecha Modificacion</th>
+        <th>Usuario que Modifico</th>
+
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for historial in historial_prenda %}
+      <tr>
+        <td>{{ historial.descripcion }}</td>
+        <td>{{ historial.precio }}</td>
+        <td>{{ historial.fecha_venta }}</td>
+        <td>{{ historial.fecha_cobro }}</td>
+        <td>{{ historial.fecha_ingreso}}</td>
+        <td>
+          {% if historial.history_type == '+' %}
+              Creado
+          {% elif historial.history_type == '~' %}
+              Modificado
+          {% elif historial.history_type == '-' %}
+              Eliminado
+          {% endif %}
+        </td>
+        <td>{{ historial.history_date}}</td>
+        <td>{{ historial.history_user}}</td>
+      </tr>
+      
+      {% endfor %}
+
+
+    </tbody>
+    <tfoot>
+      <tr>
+
+        <th>Descripcion</th>
+        <th>Precio</th>
+        <th>Fecha de Venta</th>
+        <th>Fecha de Cobro</th>
+        <th>Fecha de Ingreso</th>
+        <th>Accion</th>
+        <th>Fecha Modificacion</th>
+        <th>Usuario que Modifico</th>
+
+      </tr>
+    </tfoot>
+
+  </table>
+
+  <!-- /.card-body -->
+
+  <!-- /.card -->
+
+  <!-- /.col -->
+
+  <!-- /.row -->
+
+  <!-- /.container-fluid -->
+</section>
+<!-- /.content -->

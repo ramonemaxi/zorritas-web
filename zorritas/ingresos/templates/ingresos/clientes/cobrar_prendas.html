@@ -1,0 +1,87 @@
+<div class="justify-content-center mt-5">
+  <div class="card card-success w-50 mx-auto">
+      <div class="card-header">
+          <h3 class="card-title" style="float: left;">Prendas a Cobrar</h3>
+          <div style="float: right;">  <p class="total-container btn btn-outline-dark">Total Efectivo: <span id="totalEfectivo">0.00</span></p>
+              <p class="total-container btn btn-outline-dark">Total Crédito: <span id="totalCredito">0.00</span></p>
+          </div>
+          <div style="clear: both;"></div>
+      </div>
+      <form action="#" method="post" class="card-body">
+          {% csrf_token %}
+          <table class="table table-bordered">
+              <tr>
+                  <th>Seleccionar</th>
+                  <th>Descripción</th>
+                  <th>Precio Efectivo</th>
+                  <th>Precio Crédito</th>
+              </tr>
+              {% for prenda in prendas_a_cobrar %}
+              <tr>
+                  <td>
+                      <div class="icheck-primary inline">
+                          <input type="checkbox" name="cheks" id="checkbox-{{prenda.pk}}" value="{{prenda.pk}}"
+                                 data-precio-efectivo="{% if prenda.precio_efectivo %}{{ prenda.precio_efectivo }}{% else %}0{% endif %}"
+                                 data-precio-credito="{% if prenda.precio_credito %}{{ prenda.precio_credito }}{% else %}0{% endif %}" />
+                          <label for="checkbox-{{prenda.pk}}"></label>
+                      </div>
+                  </td>
+                  <td><label for="checkbox-{{prenda.pk}}">{{ prenda.descripcion }}</label></td>
+                  <td><label for="checkbox-{{prenda.pk}}">{{ prenda.precio_efectivo }}</label></td>
+                  <td><label for="checkbox-{{prenda.pk}}">{{ prenda.precio_credito }}</label></td>
+              </tr>
+              <script>
+                  console.log("Precio efectivo para {{ prenda.pk }}: ", "{{ prenda.precio_efectivo }}");
+                  console.log("Precio credito para {{ prenda.pk }}: ", "{{ prenda.precio_credito }}");
+              </script>
+              {% endfor %}
+          </table>
+
+
+          <div class="card-footer">
+              <button type="submit" class="btn btn-success">Submit</button>
+          </div>
+
+      </form>
+  </div>
+</div>
+
+<script>
+  const checkboxes = document.querySelectorAll('input[type="checkbox"][name="cheks"]');
+const totalEfectivoSpan = document.getElementById('totalEfectivo');
+const totalCreditoSpan = document.getElementById('totalCredito');
+
+checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+        let totalEfectivo = 0;
+        let totalCredito = 0;
+
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                // Obtener los valores como cadenas
+                let precioEfectivoStr = cb.dataset.precioEfectivo;
+                let precioCreditoStr = cb.dataset.precioCredito;
+
+                // Reemplazar comas con puntos y luego convertir a números
+                const precioEfectivo = parseFloat(precioEfectivoStr.replace(",", "."));
+                const precioCredito = parseFloat(precioCreditoStr.replace(",", "."));
+
+                if (!isNaN(precioEfectivo)) {
+                    totalEfectivo += precioEfectivo;
+                } else {
+                    console.error("Precio efectivo no es un número válido:", cb.dataset.precioEfectivo);
+                }
+
+                if (!isNaN(precioCredito)) {
+                    totalCredito += precioCredito;
+                } else {
+                    console.error("Precio crédito no es un número válido:", cb.dataset.precioCredito);
+                }
+            }
+        });
+
+        totalEfectivoSpan.textContent = totalEfectivo.toFixed(2);
+        totalCreditoSpan.textContent = totalCredito.toFixed(2);
+    });
+});
+</script>

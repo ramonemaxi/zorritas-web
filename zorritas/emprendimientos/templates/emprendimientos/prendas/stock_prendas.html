@@ -1,0 +1,103 @@
+<section class="content">
+
+
+
+
+
+  <table id="stock" class="table table-bordered table-striped">
+    <thead>
+      <tr>
+
+        <th>Descripcion</th>
+        <th>Precio Ellos</th>
+        <th>Fecha de Ingreso</th>
+        <th>Marc. Vendida</th>
+        <th>Opciones</th>
+
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for prenda in prendas_en_stock %}
+      <tr>
+        <td>{{ prenda.descripcion }}</td>
+        <td>{{ prenda.precio }}</td>
+        <td>
+          {% with prenda.fecha_ingreso|date:'Y-m-d' as formatted_date %}
+          {% if formatted_date == '1999-01-01' %}
+          <i class="fa-solid fa-xmark fa-xl" style="color:rgba(167, 43, 21, 0.89);"></i>
+          {% else %}
+          {{ prenda.fecha_ingreso_formateada}}
+          {% endif %}
+          {% endwith %}
+        </td>
+       <td> 
+        <div style="font-size: 0.8em;" data-toggle="modal" 
+          data-target="#confirmarVentaModal{{ prenda.pk }}" 
+          class=" btn  btn-outline-success">
+            <div href="#" data-toggle="tooltip" title="Marcar vendida">
+
+              <i class="fa-solid fa-money-bill-1 fa-xl"></i>
+
+            </div>
+          </div>
+       </td>
+        <td>
+          <div style="font-size: 0.8em;" data-toggle="modal" 
+          data-target="#editPrendaModalStock-{{ prenda.pk }}" 
+          class="ml-auto btn btn-flat btn-outline-warning">
+            <div href="#" data-toggle="tooltip" title="Editar Prenda">
+
+              <i class="fa-solid fa-pen-to-square"></i>
+
+            </div>
+          </div>
+
+
+          <div style="font-size: 0.8em;" data-toggle="modal"
+            data-target="#deletePrendaModalStock-{{ prenda.pk }}"
+            class="ml-auto btn btn-flat btn-outline-danger">
+            <div href="#" data-toggle="tooltip" title="Eliminar Prenda">
+
+              <i class="fa-solid fa-trash-can"></i>
+
+            </div>
+          </div>
+          </div>
+
+        </td>
+
+
+      </tr>
+      {% include "emprendimientos/prendas/editar_prenda_stock.html" %}
+      {% include "emprendimientos/prendas/eliminar_prenda_stock.html" %}
+      {% include "emprendimientos/prendas/confirmar_venta.html" %}
+      {% endfor %}
+
+
+    </tbody>
+    <tfoot>
+      <tr>
+
+        <th>Descripcion </th>
+        <th>Precio Ellos</th>
+        <th>Fecha de Ingreso</th>
+        <th>Marc. Vendida</th>
+        <th>Opciones</th>
+
+      </tr>
+    </tfoot>
+
+  </table>
+
+  <!-- /.card-body -->
+
+  <!-- /.card -->
+
+  <!-- /.col -->
+
+  <!-- /.row -->
+
+  <!-- /.container-fluid -->
+</section>
+<!-- /.content -->
