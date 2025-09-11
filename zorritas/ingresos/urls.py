@@ -56,11 +56,7 @@ urlpatterns = [
     path('examples/faq/', views.examples_faq, name='examples_faq'),
     path('examples/contact-us/', views.examples_contact_us, name='examples_contact_us'),
 
-    # Extra 
-    path('login-v1/', views.UserLoginViewV1.as_view(), name='login_v1'),
-    path('login-v2/', views.UserLoginViewV2.as_view(), name='login_v2'),
-    path('registration-v1/', views.register_v1, name='registration_v1'),
-    path('registration-v2/', views.register_v2, name='registration_v2'),
+    # Extra
     path('forgot-password-v1/', views.UserPasswordResetViewV1.as_view(), name='forgot_password_v1'),
     path('forgot-password-v2/', views.UserPasswordResetViewV2.as_view(), name='forgot_password_v2'),
     path('recover-password-v1/', views.UserPasswordChangeViewV1.as_view(), name='recover_password_v1'),

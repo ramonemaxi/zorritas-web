@@ -4,12 +4,14 @@ from emprendimientos.models import Prendas as EmprendimientosPrendas, Clientes a
 from django.db.models import Sum, F
 from django.utils.timezone import now, timedelta
 from datetime import datetime
+from django.contrib.auth.decorators import login_required
 import json
 from django.utils import timezone
 # from django.contrib.auth.decorators import user_passes_test
 def index(request):
     return render(request, 'dashboard/index.html')
 
+@login_required(login_url='login')
 def dashboard(request):
     dias = 14
     hoy = datetime.now().date()

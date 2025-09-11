@@ -35,7 +35,7 @@ STATICFILES_DIRS = [
 SECRET_KEY = 'django-insecure-@z@66ak1n3)qw#mk6k6knhbel3pdyx5i4log1e+x(wkv_huy%l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['zorritas.test','localhost']
 
@@ -108,7 +108,7 @@ DATABASES = {
         'NAME': 'zorritas',
         'USER': 'maca',
         'PASSWORD': 'M4ca1977',
-        'HOST': 'localhost',  # o la IP del servidor
+        'HOST': '168.181.185.71',  # o la IP del servidor
         'PORT': '3306',        # puerto por defecto
         'OPTIONS': {
             'charset': 'utf8mb4',  # para soportar emojis y caracteres especiales

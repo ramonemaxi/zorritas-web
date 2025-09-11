@@ -413,60 +413,15 @@ def register(request):
     context = {"form": form}
     return render(request, "accounts/register.html", context)
 
-
-def register_v1(request):
-    if request.method == "POST":
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            print("Account created successfully!")
-            return redirect("/accounts/login/")
-        else:
-            print("Registration failed!")
-    else:
-        form = RegistrationForm()
-
-    context = {"form": form}
-    return render(request, "pages/examples/register.html", context)
-
-
-def register_v2(request):
-    if request.method == "POST":
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            print("Account created successfully!")
-            return redirect("/accounts/login/")
-        else:
-            print("Registration failed!")
-    else:
-        form = RegistrationForm()
-
-    context = {"form": form}
-    return render(request, "pages/examples/register-v2.html", context)
-
-
 class UserLoginView(auth_views.LoginView):
     template_name = "accounts/login.html"
     form_class = LoginForm
     def get_success_url(self):
+        redirect_to = self.get_redirect_url()
+        if redirect_to:
+            return redirect_to
         return reverse_lazy("clientes_lista")
-    
-class MinimalLoginView(LoginView):
-    template_name = "accounts/login.html"
-    success_url = reverse_lazy("clientes_lista")
 
-
-class UserLoginViewV1(auth_views.LoginView):
-    template_name = "pages/examples/login.html"
-    form_class = LoginForm
-    success_url = reverse_lazy("clientes_lista")
-
-
-class UserLoginViewV2(auth_views.LoginView):
-    template_name = "pages/examples/login-v2.html"
-    form_class = LoginForm
-    success_url = "/clientes"
 
 
 class UserPasswordResetView(auth_views.PasswordResetView):
@@ -698,9 +653,9 @@ def language_menu(request):
     return render(request, "pages/examples/language-menu.html", context)
 
 
-def error_404(request):
+def error_404(request, exception=None):
     context = {"parent": "extra", "segment": "error_404"}
-    return render(request, "pages/examples/404.html", context)
+    return render(request, "pages/404.html", context, status=404)
 
 
 def error_500(request):

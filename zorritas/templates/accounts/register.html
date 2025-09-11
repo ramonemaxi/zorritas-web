@@ -1,5 +1,5 @@
 {% extends 'layouts/auth_base.html' %}
-
+{% load static %}
 {% block title %} Pagina de Registro {% endblock title %}
 
 {% block bodyclass %} register-page {% endblock bodyclass %}
@@ -7,7 +7,10 @@
 {% block content %}
 <div class="register-box">
   <div class="register-logo">
-    <a href="/"><b>Zorritas</b></a>
+    <a href="/">
+      <img src="{% static 'dist/img/AdminLTELogo.png' %}" alt="AdminLTE Logo" width="50" height="50" class="brand-image"
+      style="opacity: .8">
+    </a>
   </div>
 
   <div class="card">

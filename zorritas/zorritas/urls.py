@@ -17,6 +17,10 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from ingresos import views as ingresos_views
+from django.conf.urls.static import static
+from django.conf import settings
+
 
 urlpatterns = [
     path("dj-admin/", admin.site.urls),
@@ -25,5 +29,14 @@ urlpatterns = [
     path('personas/', include('ingresos.urls')),
     path('summernote/', include('django_summernote.urls')),
     path('', include('calendario.urls')),
-    path('', include('dashboard.urls'))
+    path('', include('dashboard.urls')),
+    path('accounts/register/', ingresos_views.register, name='register'),
+    path('accounts/login/', ingresos_views.UserLoginView.as_view(), name='login'),
+    path('accounts/password-change/', ingresos_views.UserPasswordChangeView.as_view(), name='password_change'),
+
 ]
+handler404 = 'ingresos.views.error_404'
+#handler500 = 'ingresos.views.error_500'
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+

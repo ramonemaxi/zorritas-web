@@ -1,10 +1,13 @@
 import datetime
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, CreateView, UpdateView, ListView
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 from .forms import (
     ClienteForm,
@@ -17,7 +20,9 @@ from .models import Clientes, Prendas
 
 # Create your views here.
 
-class CLienteDetalle(ListView):
+class CLienteDetalle(LoginRequiredMixin,ListView):
+    login_url = reverse_lazy('login')
+
     model = Clientes
     context_object_name = "cliente"
 
@@ -52,6 +57,7 @@ class CLienteDetalle(ListView):
 
 class ListaEmprendimientos(LoginRequiredMixin, ListView):
     # agregar formulario de cliente
+    login_url = reverse_lazy('login')
     model = Clientes
     template_name = "emprendimientos/clientes/listarClientes.html"
     context_object_name = "clientes"
@@ -105,7 +111,8 @@ class ListaEmprendimientos(LoginRequiredMixin, ListView):
 
 
 # clase para crar cliente
-class ClienteCreateView(CreateView):
+class ClienteCreateView(LoginRequiredMixin,CreateView):
+    login_url = reverse_lazy('login')
     model = Clientes
     form_class = ClienteForm
     template_name = "emprendimientos/clientes/listarClientes.html"
@@ -120,7 +127,8 @@ class ClienteCreateView(CreateView):
             return self.form_invalid(form)
 
 
-class ClienteUpdateView(UpdateView):
+class ClienteUpdateView(LoginRequiredMixin,UpdateView):
+    login_url = reverse_lazy('login')
     model = Clientes
     form_class = ClienteForm
     template_name = "emprendimientos/clientes/listarClientes.html"
@@ -136,14 +144,15 @@ class ClienteUpdateView(UpdateView):
             return self.form_invalid(form)
 
 
-class ClienteDeleteView(DeleteView):
+class ClienteDeleteView(LoginRequiredMixin,DeleteView):
+    login_url = reverse_lazy('login')
     model = Clientes
     success_url = reverse_lazy("emprendimiento:emprendimientos_lista")
 
     def form_valid(self, form):
         return super().form_valid(form)
 
-
+@login_required(login_url=reverse_lazy('login'))
 def confirmar_venta(request, pk):
     prenda = get_object_or_404(Prendas, pk=pk)
 
@@ -153,7 +162,7 @@ def confirmar_venta(request, pk):
         return redirect("emprendimiento:emprendimientos_detalle", pk=prenda.cliente_id.pk)
     return render(request, 'emprendimientos/prendas/confirmar_venta.html', {'prenda': prenda})
 
-
+@login_required(login_url=reverse_lazy('login'))
 def confirmar_desventa(request, pk):
     prenda = get_object_or_404(Prendas, pk=pk)
     if request.method == 'POST':
@@ -163,7 +172,8 @@ def confirmar_desventa(request, pk):
     return render(request, 'emprendimientos/prendas/confirmar_desventa.html', {'prenda': prenda})
 
 
-class PrendaCreateView(CreateView):
+class PrendaCreateView(LoginRequiredMixin,CreateView):
+    login_url = reverse_lazy('login')
     model = Prendas
     form_class = PrendasFormIngresos
     context_object_name = "prenda"
@@ -203,7 +213,8 @@ class PrendaCreateView(CreateView):
 
 
 # editar prenda
-class PrendaUpdateView(UpdateView):
+class PrendaUpdateView(LoginRequiredMixin,UpdateView):
+    login_url = reverse_lazy('login')
     model = Prendas
     form_class = PrendasFormUpdateEmprendimientos
     context_object_name = "prenda"
@@ -225,7 +236,8 @@ class PrendaUpdateView(UpdateView):
 
 
 # eliminar prenda
-class PrendaDeleteView(DeleteView):
+class PrendaDeleteView(LoginRequiredMixin,DeleteView):
+    login_url = reverse_lazy('login')
     model = Prendas
 
     # redirigir a lista_prendas
@@ -234,6 +246,7 @@ class PrendaDeleteView(DeleteView):
 
 
 # funcion para marcar como cobrada y no cobrada
+@login_required(login_url=reverse_lazy('login'))
 def confirmar_cobro(request, pk):
     prenda = get_object_or_404(Prendas, pk=pk)
     if request.method == 'POST':
@@ -242,7 +255,7 @@ def confirmar_cobro(request, pk):
         return redirect("emprendimiento:emprendimientos_detalle", pk=prenda.cliente_id.pk)
     return render(request, 'emprendimientos/prendas/confirmar_cobro.html', {'prenda': prenda})
 
-
+@login_required(login_url=reverse_lazy('login'))
 def confirmar_descobro(request, pk):
     prenda = get_object_or_404(Prendas, pk=pk)
     if request.method == 'POST':
@@ -251,7 +264,7 @@ def confirmar_descobro(request, pk):
         return redirect("emprendimiento:emprendimientos_detalle", pk=prenda.cliente_id.pk)
     return render(request, 'emprendimientos/prendas/confirmar_descobro.html', {'prenda': prenda})
 
-
+@login_required(login_url=reverse_lazy('login'))
 def guardar_anotaciones(request, cliente_id):
     cliente = get_object_or_404(Clientes, id=cliente_id)
     form = ClienteAnotacionesForm(request.POST, instance=cliente)
@@ -261,7 +274,8 @@ def guardar_anotaciones(request, cliente_id):
     return redirect('emprendimiento:emprendimientos_detalle', pk=cliente.id)  # o la vista que estés usando
 
 
-class PrendaUpdateViewTodas(UpdateView):
+class PrendaUpdateViewTodas(LoginRequiredMixin,UpdateView):
+    login_url = reverse_lazy('login')
     model = Prendas
     form_class = PrendasFormUpdateEmprendimientos
     context_object_name = "prenda"
@@ -289,7 +303,8 @@ class PrendaUpdateViewTodas(UpdateView):
 
 
 # eliminar prenda
-class PrendaDeleteViewTodas(DeleteView):
+class PrendaDeleteViewTodas(LoginRequiredMixin,DeleteView):
+    login_url = reverse_lazy('login')
     model = Prendas
 
     # redirigir a lista_prendas
